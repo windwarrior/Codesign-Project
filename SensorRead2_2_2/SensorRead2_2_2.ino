@@ -1,8 +1,8 @@
-int led = 3;
-int brightness = 0;
+#define led 3
+#define analogRange 1024
+#define pwmRange 255
 
-int analogRange = 1024;
-int pwmRange = 255;
+int brightness = 0;
 int range = 0;
 void setup(){
   Serial.begin(9600);
@@ -20,7 +20,7 @@ void loop(){
 
 
 void printVal(int sens){
-  Serial.print(" Sens: ");
-  Serial.print(sens);
+  //Serial.print(" Sens: ");
+  Serial.println(sens);
 }
 
