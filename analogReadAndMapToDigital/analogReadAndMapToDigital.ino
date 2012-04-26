@@ -26,9 +26,6 @@ void loop(){
   for(int i = 0; i < mapped; i++){
     digitalWrite(pinArray[i], HIGH);
   }
-  
-  
-  
 }
 
 void clearHigh(){
