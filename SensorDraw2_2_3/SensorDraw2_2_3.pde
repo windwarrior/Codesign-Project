@@ -16,8 +16,9 @@ import processing.serial.*;
 
 Serial myPort;        // The serial port
 int xPos = 1;         // horizontal position of the graph
-int[] prev;
+int[] prev;  // een array om het vorige gemeten punt in op te slaan, per sensor heeft de array een element
 boolean notDef = true;
+//Een array van 8 kleuren
 int[][] colors = {
   {
     255, 0, 0
@@ -60,7 +61,10 @@ void draw () {
   // everything happens in the serialEvent()
 }
 void initSerial(int count){
+  //Init array lengte op de hoeveelheid
+  //sensorvalues die aangesloten is
   prev = new int[count];
+  //zet de 'vorige' value array op height/2
   for(int i = 0; i < prev.length; i++){
     prev[i] = height/2;  
   }  
@@ -69,12 +73,17 @@ void initSerial(int count){
 void serialEvent (Serial myPort) {
   // get the ASCII string:
   String inString = myPort.readStringUntil('\n');
+  // splits de lijn op per spatie
   String[] splits = inString.split(" ");
   int i = 0;
+  //Als dit de eerste keer is dat de serialEvent methode
+  //aangeroepen wordt, doe dan wat initialisatie
   if(notDef){
     initSerial(splits.length);
     notDef = false;
-  }
+  }  
+  
+  //voor alle stukjes string in de splits-array
   for (String split : splits) {
     // trim off any whitespace:
     inString = trim(split);
@@ -83,9 +92,14 @@ void serialEvent (Serial myPort) {
     inByte = map(inByte + 512, 0, 1023, 0, height);
 
     // draw the line:
+    // col is the colorvalue in the color array
     int col = i % colors.length;
+    // zet de kleur van de lijn die we gaan tekenen
     stroke(colors[col][0], colors[col][1], colors[col][2]);
+    // teken een lijn van het huidige punt naar het opgeslagen punt
     line(xPos-1, prev[col], xPos, height - inByte);
+    // sla het getekende punt op in de previous array, om zo lijnen
+    // te kunnen trekken ipv puntjes te zetten
     prev[col] = height - (int) inByte;
     i++;
   }
