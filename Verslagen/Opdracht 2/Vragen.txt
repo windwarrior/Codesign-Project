@@ -1,0 +1,13 @@
+Welke frequentieband wordt er voor deze radio gebruikt?
+2.4GHz (2400MHz t/m 2525Mhz)
+
+Welke datasnelheid ondersteunt deze radio?
+1Mbps of 2Mbps
+
+Hoeveel kanalen ondersteunt de radio?
+126 RF kanalen
+
+Welke modulatietechniek gebruikt de radio?
+GFSK
+Gaussian frequency-shift keying
+Gaussian filter om de pulse te smoothen.
