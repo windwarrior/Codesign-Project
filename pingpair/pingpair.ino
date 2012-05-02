@@ -37,7 +37,7 @@ const int role_pin = 7;
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xd250dbcf39, 0xd250dbcf62 };
+const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
 
 //
 // Role management
@@ -89,6 +89,7 @@ void setup(void)
   //
 
   radio.begin();
+  delay(20);
   radio.setChannel(57);
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(15,15);
