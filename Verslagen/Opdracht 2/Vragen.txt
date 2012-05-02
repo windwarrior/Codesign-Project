@@ -11,3 +11,20 @@ Welke modulatietechniek gebruikt de radio?
 GFSK
 Gaussian frequency-shift keying
 Gaussian filter om de pulse te smoothen.
+
+
+Met welke functie stel je het kanaal in?
+void setChannel(uint8_t channel);
+
+Met welke functie stel je de outputpower van het zenden in?
+void powerDown(void);
+void powerUp(void) ;
+
+powerDown wordt gebruikt om de radio in low power mode te zetten, waar powerUp hem in high power  mode zet
+
+Met welke functie stel je het aantal retries van ART in?
+void setRetries(uint8_t delay, uint8_t count);
+
+Met welke functies stel je het adres van de verzender en ontvanger in?
+void openWritingPipe(uint64_t address);
+void openReadingPipe(uint8_t number, uint64_t address);
