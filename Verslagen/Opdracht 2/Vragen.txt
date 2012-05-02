@@ -17,8 +17,7 @@ Met welke functie stel je het kanaal in?
 void setChannel(uint8_t channel);
 
 Met welke functie stel je de outputpower van het zenden in?
-void powerDown(void);
-void powerUp(void) ;
+void setPALevel(rf24_pa_dbm_e level);
 
 powerDown wordt gebruikt om de radio in low power mode te zetten, waar powerUp hem in high power  mode zet
 
