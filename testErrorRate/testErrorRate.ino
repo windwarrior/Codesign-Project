@@ -3,7 +3,7 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-//#define SENDER
+#define SENDER
 #define timeoutTime 200
 enum messageTypes {
   HELO,
@@ -44,7 +44,6 @@ void setup(void){
 #else
   radio.openWritingPipe(pipes[1]);
   radio.openReadingPipe(1,pipes[0]);
-  radio.startListening();
   startListeningForHelo();
 #endif
 }
@@ -54,16 +53,15 @@ void startSendingHelo(void){
   boolean recievedHACK = false;
   while(!recievedHACK){
     radio.stopListening();
-    unsigned long time = millis();
     String sendstring = "Hallo"; //HELO + " " + time;
     Serial.print(sendstring);
     Serial.println();
     boolean sent = radio.write(&sendstring, radio.getPayloadSize());
     if(sent){
-      printf("Sent helo package at time %lu...\n\r", time);
+      printf("Sent helo package \n\r");
     }
     else{
-      printf("failed to sent package with helo \n\r"); 
+      printf("Failed to sent package with helo \n\r"); 
     }
 
     unsigned long currtime = millis();
@@ -83,25 +81,24 @@ void startSendingHelo(void){
       Serial.print(receiveString);
       Serial.println();
     }
-    delay(200);
+    delay(20);
   }
 
 }
 #else
 void startListeningForHelo(void){
-  if(radio.available()){
-    unsigned long got_time;
-    bool done = false;
-    String receiveString;
-    while (!done){
-      done = radio.read(&receiveString,  radio.getPayloadSize());
-      
-      Serial.print(receiveString);
-      Serial.println();
-      
-      delay(20);
-    }
-  }   
+  unsigned long got_time;
+  bool done = false;
+  String receiveString;
+  while (!done){
+    done = radio.read(&receiveString,  radio.getPayloadSize());
+    
+    Serial.print(receiveString);
+    Serial.println();
+    
+    delay(200);
+  }
+        
 }
 #endif
 
