@@ -34,7 +34,7 @@ void setup(void){
 
   radio.setChannel(channel);
 
-  radio.setRetries(0,0);
+  radio.setRetries(15,15);
 
   radio.printDetails();
 #ifdef SENDER
@@ -53,10 +53,12 @@ void startSendingHelo(void){
   boolean recievedHACK = false;
   while(!recievedHACK){
     radio.stopListening();
-    String sendstring = "Hallo"; //HELO + " " + time;
+    String blab = HELO + " blab";
+    char sendstring[blab.length()]; //HELO + " " + time;
+    blab.toCharArray(sendstring, blab.length());
     Serial.print(sendstring);
     Serial.println();
-    boolean sent = radio.write(&sendstring, radio.getPayloadSize());
+    boolean sent = radio.write(&sendstring, 32);
     if(sent){
       printf("Sent helo package \n\r");
     }
@@ -95,11 +97,11 @@ void startListeningForHelo(void){
       while (!done){
         done = radio.read(&receiveString,  radio.getPayloadSize());
         
-       // Serial.print(receiveString);
-       //Serial.println();
-       // Serial.print("adfsfsdfsdfsdf");
-       // Serial.println();
-       printf("Bericht: %s", receiveString);
+        // Serial.print(receiveString);
+        //Serial.println();
+        // Serial.print("adfsfsdfsdfsdf");
+        // Serial.println();
+        printf("Bericht: %s", receiveString);
         
         delay(20);
       }
