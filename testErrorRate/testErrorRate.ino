@@ -87,18 +87,24 @@ void startSendingHelo(void){
 }
 #else
 void startListeningForHelo(void){
-  unsigned long got_time;
-  bool done = false;
-  String receiveString;
-  while (!done){
-    done = radio.read(&receiveString,  radio.getPayloadSize());
-    
-    Serial.print(receiveString);
-    Serial.println();
-    
-    delay(200);
-  }
+
+  while(true){
+    if(radio.available()){
+      bool done = false;
+      String receiveString;
+      while (!done){
+        done = radio.read(&receiveString,  radio.getPayloadSize());
         
+       // Serial.print(receiveString);
+       //Serial.println();
+       // Serial.print("adfsfsdfsdfsdf");
+       // Serial.println();
+       printf("Bericht: %s", receiveString);
+        
+        delay(20);
+      }
+    }
+  }
 }
 #endif
 
