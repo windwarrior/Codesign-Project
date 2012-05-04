@@ -92,6 +92,8 @@ void startListeningForHelo(void){
     
     Serial.print(receiveString);
     Serial.println();
+    
+    delay(200);
   }
         
 }
