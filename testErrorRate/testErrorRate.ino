@@ -3,7 +3,7 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-#define SENDER
+//#define SENDER
 #define timeoutTime 200
 enum messageTypes {
   HELO,
@@ -44,6 +44,7 @@ void setup(void){
 #else
   radio.openWritingPipe(pipes[1]);
   radio.openReadingPipe(1,pipes[0]);
+  radio.startListening();
   startListeningForHelo();
 #endif
 }
@@ -53,12 +54,10 @@ void startSendingHelo(void){
   boolean recievedHACK = false;
   while(!recievedHACK){
     radio.stopListening();
-    String blab = HELO + " blab";
-    char sendstring[blab.length()]; //HELO + " " + time;
-    blab.toCharArray(sendstring, blab.length());
+    String sendstring = "Hallo"; //HELO + " " + time;
     Serial.print(sendstring);
     Serial.println();
-    boolean sent = radio.write(&sendstring, 32);
+    boolean sent = radio.write(&sendstring, radio.getPayloadSize());
     if(sent){
       printf("Sent helo package \n\r");
     }
@@ -92,16 +91,17 @@ void startListeningForHelo(void){
 
   while(true){
     if(radio.available()){
+      Serial.print("Payload received: ");
       bool done = false;
-      String receiveString;
+      char receiveString[32];
       while (!done){
-        done = radio.read(&receiveString,  radio.getPayloadSize());
+        done = radio.read(&receiveString,  32);
         
-        // Serial.print(receiveString);
+       Serial.print(receiveString);
+       Serial.println();
+        //Serial.print("adfsfsdfsdfsdf");
         //Serial.println();
-        // Serial.print("adfsfsdfsdfsdf");
-        // Serial.println();
-        printf("Bericht: %s", receiveString);
+      // printf("Bericht: %s", receiveString);
         
         delay(20);
       }
