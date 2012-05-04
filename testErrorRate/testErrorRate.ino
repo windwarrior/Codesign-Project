@@ -3,11 +3,14 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-//#define SENDER
-
-#define HELO 1
-#define HACK 2
-
+#define SENDER
+#define timeoutTime 200
+enum messageTypes {
+  HELO,
+  HACK,
+  PING,
+  ACK
+};
 
 RF24 radio(3,9);
 
@@ -43,18 +46,41 @@ void setup(void){
   #endif
 }
 
+#ifdef SENDER
 void startSendingHelo(void){
     boolean recievedHACK = false;
     while(!recievedHACK){
       radio.stopListening();
       unsigned long time = millis();
+      String sendstring = "allo";//HELO + " " + time;
+      boolean sent = radio.write(&sendstring, sizeof(sendstring));
+      if(sent){
+        printf("Sent helo package at time %lu...\n\r", time);
+      }else{
+        printf("failed to sent package with helo",time); 
+      }
       
+      unsigned long currtime = millis();
+      bool timeout = false;
+      while ( ! radio.available() && ! timeout )
+        if (millis() - currtime > timeoutTime )
+          timeout = true;
+      
+      if(timeout){
+        printf("Did not recieve hack, resending ... \n\r");
+      } else {
+        String recieveString;
+        radio.read(&recieveString, 2000);
+        printf("Got response: '%s'\n\r", recieveString);
+      }
     }
       
 }
+#else
 void startListeningForHelo(void){
 
 }
+#endif
 
 void loop(void){
   
