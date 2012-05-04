@@ -14,7 +14,7 @@ enum messageTypes {
 
 RF24 radio(3,9);
 
-const int channel = 57;
+#define channel 67
 
 const uint64_t pipes[2] = {
   0xd250dbcf39LL, 0x4aac2e23feLL};
@@ -28,7 +28,7 @@ void setup(void){
   printf("Will listen for HELO\n\r");
 #endif
 
-    radio.begin();
+  radio.begin();
 
   delay(20);
 
@@ -36,6 +36,7 @@ void setup(void){
 
   radio.setRetries(0,0);
 
+  radio.printDetails();
 #ifdef SENDER
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
@@ -53,13 +54,15 @@ void startSendingHelo(void){
   while(!recievedHACK){
     radio.stopListening();
     unsigned long time = millis();
-    String sendstring = HELO + " " + time;
-    boolean sent = radio.write(&sendstring, sizeof(sendstring));
+    String sendstring = "Hallo"; //HELO + " " + time;
+    Serial.print(sendstring);
+    Serial.println();
+    boolean sent = radio.write(&sendstring, radio.getPayloadSize());
     if(sent){
       printf("Sent helo package at time %lu...\n\r", time);
     }
     else{
-      printf("failed to sent package with helo"); 
+      printf("failed to sent package with helo \n\r"); 
     }
 
     unsigned long currtime = millis();
@@ -79,6 +82,7 @@ void startSendingHelo(void){
       Serial.print(receiveString);
       Serial.println();
     }
+    delay(200);
   }
 
 }
