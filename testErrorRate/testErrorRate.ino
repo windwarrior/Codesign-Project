@@ -3,7 +3,7 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-#define SENDER
+//#define SENDER
 #define timeoutTime 200
 enum messageTypes {
   HELO,
@@ -44,6 +44,7 @@ void setup(void){
 #else
   radio.openWritingPipe(pipes[1]);
   radio.openReadingPipe(1,pipes[0]);
+  radio.startListening();
   startListeningForHelo();
 #endif
 }
@@ -88,18 +89,19 @@ void startSendingHelo(void){
 }
 #else
 void startListeningForHelo(void){
-  unsigned long got_time;
-  bool done = false;
-  String receiveString;
-  while (!done){
-    done = radio.read(&receiveString,  radio.getPayloadSize());
-    
-    Serial.print(receiveString);
-    Serial.println();
-    
-    delay(200);
-  }
-        
+  if(radio.available()){
+    unsigned long got_time;
+    bool done = false;
+    String receiveString;
+    while (!done){
+      done = radio.read(&receiveString,  radio.getPayloadSize());
+      
+      Serial.print(receiveString);
+      Serial.println();
+      
+      delay(20);
+    }
+  }   
 }
 #endif
 
