@@ -3,7 +3,7 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-//#define SENDER
+#define SENDER
 #define timeoutTime 200
 #define HELO 0
 #define HACK 1
@@ -49,19 +49,18 @@ void setup(void){
 
 #ifdef SENDER
 void startSendingHelo(void){
-  boolean recievedHACK = false;
-  while(!recievedHACK){
+  boolean receivedHACK = false;
+  while(!receivedHACK){
     radio.stopListening();
-    char sendstring = 0;
-    Serial.println(sendstring);
-    Serial.println(HELO);
-    boolean sent = radio.write(&sendstring, radio.getPayloadSize());
+    char sendstring[] = "Hallo";
+    boolean sent = radio.write(&sendstring, 5);
     if(sent){
       printf("Sent helo package \n\r");
     }
     else{
       printf("Failed to sent package with helo \n\r"); 
     }
+    radio.startListening();
 
     unsigned long currtime = millis();
     bool timeout = false;
@@ -74,13 +73,17 @@ void startSendingHelo(void){
       printf("Did not recieve hack, resending ... \n\r");
     } 
     else {
-      String receiveString;
-      radio.read(&receiveString, radio.getPayloadSize());
-      Serial.print("Got response: " );
-      Serial.print(receiveString);
-      Serial.println();
+      char receiveString;
+      radio.read(&receiveString,sizeof(char));
+      if(receiveString == 'A'){
+        Serial.println("Handshake done!");
+        radio.stopListening();
+        char someChar = 'X';
+        radio.write(&someChar, sizeof(char));
+        receivedHACK = true;
+      }
     }
-    delay(20);
+    delay(200);
   }
 
 }
@@ -114,7 +117,42 @@ void startListeningForHelo(void){
 }
 #endif
 
-void loop(void){
 
+void loop(void){
+  #ifdef SENDER
+  for(int i = 0; i < 10; i++){
+    String jeMoedersString = "ping ";
+    jeMoedersString.concat(i);
+    jeMoedersString.concat(" ");
+    jeMoedersString.concat(millis());
+    char jeMoedersStringInChars[32];
+    jeMoedersString.toCharArray(jeMoedersStringInChars, 32);
+    Serial.println(jeMoedersString);
+    
+    radio.stopListening();
+    boolean blab = radio.write(&jeMoedersStringInChars, 32);
+    radio.startListening();
+    Serial.println(blab);
+    unsigned long currtime = millis();
+    bool timeout = false;
+    while ( ! radio.available() && ! timeout ){
+      if (millis() - currtime > timeoutTime ){
+        timeout = true;
+      }
+    }
+    if(timeout){
+      printf("Did not recieve ACK\n\r");
+    } 
+    else {
+      char receiveString[32];
+      radio.read(&receiveString,32);
+      Serial.println(receiveString);
+    }
+  
+    delay(100);  
+  }
+  #else
+  
+  #endif
 }
 
