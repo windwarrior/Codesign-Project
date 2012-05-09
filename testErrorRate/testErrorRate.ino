@@ -79,8 +79,6 @@ void startSendingHelo(void){
       if(receiveString == 'A'){
         Serial.println("Handshake done!");
         radio.stopListening();
-        char someChar = 'X';
-        radio.write(&someChar, sizeof(char));
         receivedHACK = true;
       }
     }
@@ -96,7 +94,7 @@ void startListeningForHelo(void){
       char receiveChar[32];
       while (!done){
         done = radio.read(&receiveChar,  32);
-        if(receiveChar[0] == 'H'){
+        if(receiveChar[0] == 'h'){
           Serial.print(" Receiving HELO ");
           delay(20);
 
