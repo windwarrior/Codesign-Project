@@ -56,7 +56,7 @@ void startSendingHelo(void){
     char sendstring[] = HELO;
     boolean sent = radio.write(&sendstring, 32);
     if(sent){
-      //printf("Sent helo package \n\r");
+      printf("Sent helo package \n\r");
     }
     else{
       printf("Failed to sent package with helo \n\r"); 
@@ -71,7 +71,7 @@ void startSendingHelo(void){
       }
     }
     if(timeout){
-      //printf("Did not recieve hack, resending ... \n\r");
+      printf("Did not recieve hack, resending ... \n\r");
     } 
     else {
       char receiveString;
