@@ -3,12 +3,12 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-#define SENDER
+//#define SENDER
 #define timeoutTime 200
-#define HELO 0
-#define HACK 1
-#define PING 2
-#define ACK  3
+#define HELO "helo"
+#define HACK "hack"
+#define PING "ping"
+#define ACK  "ack"
 
 RF24 radio(3,9);
 
@@ -26,7 +26,7 @@ void setup(void){
   printf("Will listen for HELO\n\r");
 #endif
 
-  radio.begin();
+    radio.begin();
 
   delay(20);
 
@@ -52,8 +52,8 @@ void startSendingHelo(void){
   boolean receivedHACK = false;
   while(!receivedHACK){
     radio.stopListening();
-    char sendstring[] = "Hallo";
-    boolean sent = radio.write(&sendstring, 5);
+    char sendstring[] = HELO;
+    boolean sent = radio.write(&sendstring, 32);
     if(sent){
       printf("Sent helo package \n\r");
     }
@@ -91,28 +91,23 @@ void startSendingHelo(void){
 void startListeningForHelo(void){
   while(true){
     if(radio.available()){
-      Serial.print("Payload received: ");
       bool done = false;
       char receiveChar[32];
       while (!done){
         done = radio.read(&receiveChar,  32);
-        Serial.print("Response ");
-        Serial.print(receiveChar[0]);
-        //Serial.print(HELO);         
-           
-        if(receiveChar[0] == 'h'){
+        if(receiveChar[0] == 'H'){
           Serial.print(" Receiving HELO ");
           delay(20);
-          
+
           radio.stopListening();
           char result = 'A';
           boolean sent = radio.write(&result, radio.getPayloadSize());
           Serial.print(sent);
           radio.startListening();
         }
-        
+
         Serial.println();
-        
+
         delay(200);
       }
     }
@@ -122,20 +117,15 @@ void startListeningForHelo(void){
 
 
 void loop(void){
-  #ifdef SENDER
+#ifdef SENDER
   for(int i = 0; i < 10; i++){
-    String jeMoedersString = "ping ";
-    jeMoedersString.concat(i);
-    jeMoedersString.concat(" ");
-    jeMoedersString.concat(millis());
-    char jeMoedersStringInChars[32];
-    jeMoedersString.toCharArray(jeMoedersStringInChars, 32);
-    Serial.println(jeMoedersString);
-    
+    char msg[32];
+    generatePingMessage(msg, i);    
+    Serial.println(generatePingMessage);
     radio.stopListening();
-    boolean blab = radio.write(&jeMoedersStringInChars, 32);
+    boolean sent = radio.write(&msg, 32);    
     radio.startListening();
-    Serial.println(blab);
+
     unsigned long currtime = millis();
     bool timeout = false;
     while ( ! radio.available() && ! timeout ){
@@ -143,19 +133,42 @@ void loop(void){
         timeout = true;
       }
     }
+
     if(timeout){
-      printf("Did not recieve ACK\n\r");
+      printf("timeout ACK %d\n\r", i);
     } 
     else {
       char receiveString[32];
       radio.read(&receiveString,32);
       Serial.println(receiveString);
     }
-  
+
     delay(100);  
   }
-  #else
-  
-  #endif
+#else
+  while(true){
+    char receiveChar[32];
+    bool done = false;
+    while (!done){
+        done = radio.read(&receiveChar,  32);
+        String receiveString = receiveChar;
+        if(receiveString.substring(0,4).compareTo("ping") == 0){//oke dit is echt facking lelijk ja
+          radio.stopListening();
+          receiveChar[1] = 'o'; //kan niet makkelijker, er gewoon pong van maken :D
+          boolean sent = radio.write(&receiveChar, 32);
+          radio.startListening();
+        }
+    }
+  }          
+#endif
 }
+
+void generatePingMessage(char pingMessageInChar[], int i){
+  String pingMessage = "ping ";
+  pingMessage.concat(i);
+  pingMessage.concat(" ");
+  pingMessage.concat(millis());
+  pingMessage.toCharArray(pingMessageInChar, 32);
+}
+
 
