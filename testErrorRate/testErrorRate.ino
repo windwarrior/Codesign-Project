@@ -88,25 +88,22 @@ void startSendingHelo(void){
 }
 #else
 void startListeningForHelo(void){
-  while(true){
+  boolean finished;
+  while(!finished){
     if(radio.available()){
       bool done = false;
       char receiveChar[32];
       while (!done){
         done = radio.read(&receiveChar,  32);
         if(receiveChar[0] == 'h'){
-          Serial.print(" Receiving HELO ");
           delay(20);
 
           radio.stopListening();
           char result = 'A';
           boolean sent = radio.write(&result, radio.getPayloadSize());
-          Serial.print(sent);
           radio.startListening();
+          finished = true;
         }
-
-        Serial.println();
-
         delay(20);
       }
     }
