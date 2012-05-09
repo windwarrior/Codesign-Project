@@ -3,12 +3,12 @@
 #include <nRF24L01.h>
 #include <SPI.h>
 #include "printf.h"
-//#define SENDER
+#define SENDER
 #define timeoutTime 200
 #define HELO "helo"
 #define HACK "hack"
 #define PING "ping"
-#define PONG  "pong"
+#define PONG "pong"
 
 RF24 radio(3,9);
 
@@ -88,7 +88,7 @@ void startSendingHelo(void){
 }
 #else
 void startListeningForHelo(void){
-  boolean finished;
+  boolean finished = false;
   while(!finished){
     if(radio.available()){
       bool done = false;
