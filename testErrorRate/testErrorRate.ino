@@ -12,7 +12,7 @@
 
 RF24 radio(3,9);
 
-#define channel 0
+#define channel 67
 
 const uint64_t pipes[2] = {
   0xd250dbcf39LL, 0x4aac2e23feLL};
@@ -31,10 +31,10 @@ void setup(void){
   delay(20);
 
   radio.setChannel(channel);
-
+  radio.setPALevel(RF24_PA_MIN);
+  //radio.setDataRate(RF24_2MBPS);
   radio.setRetries(0,0);
   radio.setAutoAck(false);
-  
   radio.printDetails();
 #ifdef SENDER
   radio.openWritingPipe(pipes[0]);
@@ -137,6 +137,9 @@ void loop(void){
       char receiveString[32];
       radio.read(&receiveString,32);
       Serial.println(receiveString);
+      Serial.print("current time ");
+      Serial.print(millis());
+      Serial.println();
     }
 
     delay(100);  
