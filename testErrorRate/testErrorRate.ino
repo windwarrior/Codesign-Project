@@ -8,11 +8,11 @@
 #define HELO "helo"
 #define HACK "hack"
 #define PING "ping"
-#define ACK  "ack"
+#define PONG  "pong"
 
 RF24 radio(3,9);
 
-#define channel 67
+#define channel 0
 
 const uint64_t pipes[2] = {
   0xd250dbcf39LL, 0x4aac2e23feLL};
@@ -26,14 +26,15 @@ void setup(void){
   printf("Will listen for HELO\n\r");
 #endif
 
-    radio.begin();
+  radio.begin();
 
   delay(20);
 
   radio.setChannel(channel);
 
-  radio.setRetries(15,15);
-
+  radio.setRetries(0,0);
+  radio.setAutoAck(false);
+  
   radio.printDetails();
 #ifdef SENDER
   radio.openWritingPipe(pipes[0]);
@@ -55,7 +56,7 @@ void startSendingHelo(void){
     char sendstring[] = HELO;
     boolean sent = radio.write(&sendstring, 32);
     if(sent){
-      printf("Sent helo package \n\r");
+      //printf("Sent helo package \n\r");
     }
     else{
       printf("Failed to sent package with helo \n\r"); 
@@ -70,7 +71,7 @@ void startSendingHelo(void){
       }
     }
     if(timeout){
-      printf("Did not recieve hack, resending ... \n\r");
+      //printf("Did not recieve hack, resending ... \n\r");
     } 
     else {
       char receiveString;
@@ -83,7 +84,7 @@ void startSendingHelo(void){
         receivedHACK = true;
       }
     }
-    delay(200);
+    delay(20);
   }
 
 }
@@ -108,7 +109,7 @@ void startListeningForHelo(void){
 
         Serial.println();
 
-        delay(200);
+        delay(20);
       }
     }
   }
@@ -118,10 +119,10 @@ void startListeningForHelo(void){
 
 void loop(void){
 #ifdef SENDER
-  for(int i = 0; i < 10; i++){
+  for(int i = 0; i < 100; i++){
     char msg[32];
     generatePingMessage(msg, i);    
-    Serial.println(generatePingMessage);
+    Serial.println(msg);
     radio.stopListening();
     boolean sent = radio.write(&msg, 32);    
     radio.startListening();
@@ -145,6 +146,7 @@ void loop(void){
 
     delay(100);  
   }
+  exit(0);
 #else
   while(true){
     char receiveChar[32];
