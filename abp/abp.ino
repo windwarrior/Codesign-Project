@@ -12,6 +12,10 @@
 #define SENDER 0
 #define RECEIVER 0
 RF24 radio(3,9);
+uint64_t baseadress = 0xd250dbcf00ll;/*doe hier iets mee*/
+byte hopToSender = 0xab;/*doe hier iets mee*/
+byte hopToReceiver = 0xcd; /*doe hier iets mee*/
+byte hopReadingPipe = 0xef; /*doe hier iets mee*/
 void setup(void){
   Serial.begin(57600);
   radio.begin();
@@ -19,6 +23,20 @@ void setup(void){
 
   radio.setChannel(channel);
   radio.printDetails();
+  
+  #ifdef SND
+  radio.openReadingPipe(1, generateAddress(hopToSender));
+  radio.openWritingPipe(generateAddress(hopReadingPipe));
+  #endif
+  
+  #ifdef HOP
+  radio.openReadingPipe(2, generateAddress(hopReadingPipe));
+  #endif
+  
+  #ifdef RCV
+  radio.openReadingPipe(3, generateAddress(hopToReadingPipe));
+  radio.writingPipe(generateAddress(hopReadingPipe));
+  #endif
 
 }
 
@@ -67,7 +85,9 @@ void loop(void){
 #endif
 }
 
-
+uint64_t generateAddress(byte addr){
+  return (baseadress & ~0xff) | addr;
+}
 
 
 
