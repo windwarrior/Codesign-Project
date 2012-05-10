@@ -6,6 +6,8 @@
 
 #define channel 67
 #define HOP
+//#define SND
+//#define RCV
 
 #define SENDER 0
 #define RECEIVER 0
@@ -21,9 +23,9 @@ void setup(void){
 }
 
 void loop(void){
-#ifdef HOP
+#ifdef HOP //hop
   radio.startListening();
-  bool timeout = false;
+  //bool timeout = false;
   boolean ready = false;
   uint64_t sendTo =  0;
   while (!ready){
@@ -38,11 +40,31 @@ void loop(void){
     }  
   }
   char readstring[32];
-  radio.read(&readstring, 32);
+  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
   radio.openWritingPipe(sendTo);
   radio.write(&readstring, 32);
-#endif
+  
+#elif RCV //receiver
+  //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
+   
+  radio.startListening();
+  
+  if(radio.available()){
+    bool done = false;
+    char receiveChar[32];
+    while(!done){
+      done = radio.read(&receiveChar, 32);
+      radio.stopListening();
+      char result = 'A';//de ack moet ook nog het seq number in die in receiveChar zit
+      boolean sent = radio.write(&result, radio.getPayloadSize());
+    }
+  }
+  //en weer loop
+  
+#elif SND //sender
+  //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
 
+#endif
 }
 
 
