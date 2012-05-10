@@ -63,6 +63,14 @@ void loop(void){
   
 #elif SND //sender
   //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
+  
+  boolean finished = false;
+  boolean seq = 0;//huidig sequence nummer
+  boolean receivedAck = false;
+  
+  while(!finished){
+     
+  }  
 
 #endif
 }
