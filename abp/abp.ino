@@ -6,8 +6,8 @@
 #include "printf.h"
 #define channel 67
 //ONLY DEFINE 1
-//#define HOP
-#define SND
+#define HOP
+//#define SND
 //#define RCV
 RF24 radio(3,9);
 uint64_t baseadress = 0x1761d0f640ll;/*doe hier iets mee*/
@@ -43,9 +43,9 @@ void setup(void){
 
 #ifdef HOP
   Serial.println("bliep");
-  radio.openWritingPipe(hopToSenderAddr);
   radio.openReadingPipe(HOP_SENDER, hopSenderReadingPipeAddr);
-  radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);
+  radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);\
+  radio.openWritingPipe(hopToSenderAddr);
 #endif
 
 #ifdef RCV
@@ -58,7 +58,6 @@ void setup(void){
 
 void loop(void){
 #ifdef HOP //hop
-  radio.startListening();
   //bool timeout = false;
   boolean ready = false;
   uint64_t sendTo =  0;
@@ -79,6 +78,7 @@ void loop(void){
   radio.stopListening();
   radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
   Serial.println(readstring);
+  radio.startListening();
 //  radio.openWritingPipe(sendTo);
 //  radio.write(&readstring, 32);
 #endif 
@@ -112,7 +112,6 @@ void loop(void){
    flip bit
    globseq++;
    */
-  radio.stopListening();
   char msg[32];
   String msgString = seq == 0 ? "0" : "1";
   msgString.toCharArray(msg, 32);
@@ -174,12 +173,13 @@ void loop(void){
         seq = !seq;
         globSeq++;
       }
-      
+      radio.startListening();
       delay(20);
     }
     else{
       //Radio timeout
     }
+    radio.startListening();
   }
   else{
     //Backoff timer
