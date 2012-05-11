@@ -3,25 +3,33 @@
 #include <RF24.h>
 #include <nRF24L01.h>
 #include <RF24_config.h>
-
+#include "printf.h"
 #define channel 67
-#define HOP
-//#define SND
+//ONLY DEFINE 1
+//#define HOP
+#define SND
 //#define RCV
-
-#define SENDER 0
-#define RECEIVER 0
 RF24 radio(3,9);
 uint64_t baseadress = 0xd250dbcf00ll;/*doe hier iets mee*/
 byte hopToSender = 0xab;/*doe hier iets mee*/
 byte hopToReceiver = 0xcd; /*doe hier iets mee*/
-byte hopReadingPipe = 0xef; /*doe hier iets mee*/
+byte hopReceiverReadingPipe = 0xef; /*doe hier iets mee*/
+byte hopSenderReadingPipe = 0x33;
+uint64_t hopToSenderAddr = 0xd250dbcfabll //generateAddress(hopToSender);
+uint64_t hopToReceiverAddr = 0xd250dbcfcdll //generateAddress(hopToReceiver);
+uint64_t hopReceiverReadingPipeAddr = 0xd250dbcfefll //generateAddress(hopReceiverReadingPipe);
+uint64_t hopSenderReadingPipeAddr = 0xd250dbcf33ll //generateAddress(hopSenderReadingPipe);
 
+uint8_t HOP_SENDER = 2;
+uint8_t HOP_RECEIVER = 3;
 boolean seq = 0;//huidig sequence nummer
 boolean receivedAck = false;  
 unsigned int globSeq = 0;
+
 void setup(void){
   Serial.begin(57600);
+  Serial.println("BLIEEEEEEP");
+  printf_begin();
   radio.begin();
   delay(20);
 
@@ -29,19 +37,19 @@ void setup(void){
   radio.printDetails();
 
 #ifdef SND
-  radio.openReadingPipe(1, generateAddress(hopToSender));
-  radio.openWritingPipe(generateAddress(hopReadingPipe));
+  radio.openReadingPipe(1, hopToSenderAddr);
+  radio.openWritingPipe(hopSenderReadingPipeAddr);
 #endif
 
 #ifdef HOP
-  radio.openReadingPipe(2, generateAddress(hopReadingPipe));
+  radio.openReadingPipe(HOP_SENDER, hopSenderReadingPipeAddr);
+  radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);
 #endif
 
 #ifdef RCV
-  radio.openReadingPipe(3, generateAddress(hopToReadingPipe));
-  radio.writingPipe(generateAddress(hopReadingPipe));
+  radio.openReadingPipe(4, hopToReceiverAddr);
+  radio.openWritingPipe(hopReceiverReadingPipeAddr);
 #endif
-
 }
 
 void loop(void){
@@ -51,22 +59,26 @@ void loop(void){
   boolean ready = false;
   uint64_t sendTo =  0;
   while (!ready){
-    if(radio.available(SENDER)){
+    if(radio.available(&HOP_SENDER)){
       ready = true;
-      sendTo = RECEIVER;
+      sendTo = hopToReceiverAddr;
+      Serial.println("Got message from sender, sending to receiver");
     }
 
-    if(radio.available(RECEIVER)){
+    if(radio.available(&HOP_RECEIVER)){
       ready = true;
-      sendTo = SENDER;
+      sendTo = hopToSenderAddr;
+      Serial.println("Got message from receiver, sending to sender");
     }  
   }
   char readstring[32];
   radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
+  Serial.println(readstring);
   radio.openWritingPipe(sendTo);
   radio.write(&readstring, 32);
+#endif 
 
-#elif RCV //receiver
+#ifdef RCV //receiver
   //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
 
   radio.startListening();
@@ -77,13 +89,14 @@ void loop(void){
     while(!done){
       done = radio.read(&receiveChar, 32);
       radio.stopListening();
-      char result = 'A';//de ack moet ook nog het seq number in die in receiveChar zit
-      boolean sent = radio.write(&result, radio.getPayloadSize());
+      //de ack moet ook nog het seq number in die in receiveChar zit
+      boolean sent = radio.write(&receiveChar, radio.getPayloadSize());
     }
   }
   //en weer loop
+#endif
 
-#elif SND //sender
+#ifdef SND //sender
   //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
   /*
   send some package
@@ -96,8 +109,12 @@ void loop(void){
    */
   radio.stopListening();
   char msg[32];
+  String msgString = seq == 0 ? "0" : "1";
+  msgString.toCharArray(msg, 32);
+  Serial.print(msg);
   boolean succes = radio.write(&msg, 32);
   if(succes){
+    Serial.println(" succes");
     boolean gotAck = false;
     radio.startListening();
     unsigned long started_waiting_at = millis();
@@ -148,6 +165,7 @@ void loop(void){
       char seqChar = seq == 0 ? '0' : '1';
       if(stringSet[0][0] == seqChar){//DIT GAAT VAST STUK HIER
         //hele string outputten en checken of de globSeq nog gelijk i
+        Serial.println(msg);
         seq = !seq;
         globSeq++;
       }
@@ -158,10 +176,9 @@ void loop(void){
   }
   else{
     //Backoff timer
+    Serial.println(" fail");
     delay(random(20,50));
   } 
-
-
 #endif
 }
 

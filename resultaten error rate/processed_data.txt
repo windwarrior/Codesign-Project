@@ -1,0 +1,71 @@
+current file is: channel125powerMEDdistance1M2MBPSx
+ErrorRate: 3%
+Average RTT: 3
+current file is: channel125powerMEDdistance1M
+ErrorRate: 3%
+current file is: channel67powerMEDdistance1M2MBPSx
+ErrorRate: 0%
+Average RTT: 3
+current file is: channel67powerMIDdistance10M
+ErrorRate: 4%
+Average RTT: 3
+current file is: channel0powerHIGHdistance1M2MBPS
+ErrorRate: 0%
+current file is: channel67powerLOWdistance10Mx
+ErrorRate: 6%
+Average RTT: 3
+current file is: channel67powerLOWdistance1M
+ErrorRate: 0%
+current file is: channel125powerLOWdistance1M
+ErrorRate: 1%
+current file is: channel125powerHIGHdistance1M2mbpsx
+ErrorRate: 0%
+Average RTT: 3
+current file is: channel0powerMEDdistance1m2MBPSx
+ErrorRate: 3%
+Average RTT: 3
+current file is: channel67powerHIGHdistance5M
+ErrorRate: 6%
+Average RTT: 3
+current file is: channel125powerLOWdistance1M2MBPSx
+ErrorRate: 2%
+Average RTT: 3
+current file is: channel0powerHIGHdistance1M~
+ErrorRate: 33%
+current file is: channel67powerHIGHdistance1M2MBPSx
+ErrorRate: 1%
+Average RTT: 3
+current file is: channel67powerLOWdistance1M2MBPSx
+ErrorRate: 8%
+Average RTT: 3
+current file is: channel0powerMEDdistance1M
+ErrorRate: 2%
+current file is: channel67powerLOWdistance5M
+ErrorRate: 24%
+Average RTT: 3
+current file is: channel67powerMINdistance5M
+ErrorRate: 62%
+Average RTT: 1
+current file is: channel67powerMINdistance10Mx
+ErrorRate: 86%
+current file is: channel67powerMEDdistance1M
+ErrorRate: 0%
+current file is: channel67powerHIGHdinstance1M2MBPS
+ErrorRate: 1%
+current file is: channel67powerHIGHdistance1M
+ErrorRate: 1%
+current file is: channel0powerLOWdistance1M
+ErrorRate: 1%
+current file is: channel67powerMEDdistance5M
+ErrorRate: 2%
+Average RTT: 3
+current file is: channel67powerHIGHdistance10M
+ErrorRate: 3%
+Average RTT: 3
+current file is: channel0powerLOWdistance1M2MBPSx
+ErrorRate: 5%
+Average RTT: 3
+current file is: channel125powerHIGHdistance1M
+ErrorRate: 16%
+current file is: channel0powerHIGHdistance1M
+ErrorRate: 94%
