@@ -10,15 +10,15 @@
 #define SND
 //#define RCV
 RF24 radio(3,9);
-uint64_t baseadress = 0xd250dbcf00ll;/*doe hier iets mee*/
+uint64_t baseadress = 0x1761d0f640ll;/*doe hier iets mee*/
 byte hopToSender = 0xab;/*doe hier iets mee*/
 byte hopToReceiver = 0xcd; /*doe hier iets mee*/
 byte hopReceiverReadingPipe = 0xef; /*doe hier iets mee*/
 byte hopSenderReadingPipe = 0x33;
-uint64_t hopToSenderAddr = 0xd250dbcfabll //generateAddress(hopToSender);
-uint64_t hopToReceiverAddr = 0xd250dbcfcdll //generateAddress(hopToReceiver);
-uint64_t hopReceiverReadingPipeAddr = 0xd250dbcfefll //generateAddress(hopReceiverReadingPipe);
-uint64_t hopSenderReadingPipeAddr = 0xd250dbcf33ll //generateAddress(hopSenderReadingPipe);
+uint64_t hopToSenderAddr = 0x1761d0f64all; //generateAddress(hopToSender);
+uint64_t hopToReceiverAddr = 0x1761d0f64bll; //generateAddress(hopToReceiver);
+uint64_t hopReceiverReadingPipeAddr = 0x1761d0f64cll; //generateAddress(hopReceiverReadingPipe);
+uint64_t hopSenderReadingPipeAddr = 0x1761d0f64dll; //generateAddress(hopSenderReadingPipe);
 
 uint8_t HOP_SENDER = 2;
 uint8_t HOP_RECEIVER = 3;
@@ -34,7 +34,7 @@ void setup(void){
   delay(20);
 
   radio.setChannel(channel);
-  radio.printDetails();
+  
 
 #ifdef SND
   radio.openReadingPipe(1, hopToSenderAddr);
@@ -42,6 +42,8 @@ void setup(void){
 #endif
 
 #ifdef HOP
+  Serial.println("bliep");
+  radio.openWritingPipe(hopToSenderAddr);
   radio.openReadingPipe(HOP_SENDER, hopSenderReadingPipeAddr);
   radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);
 #endif
@@ -50,6 +52,8 @@ void setup(void){
   radio.openReadingPipe(4, hopToReceiverAddr);
   radio.openWritingPipe(hopReceiverReadingPipeAddr);
 #endif
+
+  radio.printDetails();
 }
 
 void loop(void){
@@ -72,10 +76,11 @@ void loop(void){
     }  
   }
   char readstring[32];
+  radio.stopListening();
   radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
   Serial.println(readstring);
-  radio.openWritingPipe(sendTo);
-  radio.write(&readstring, 32);
+//  radio.openWritingPipe(sendTo);
+//  radio.write(&readstring, 32);
 #endif 
 
 #ifdef RCV //receiver
@@ -165,10 +170,12 @@ void loop(void){
       char seqChar = seq == 0 ? '0' : '1';
       if(stringSet[0][0] == seqChar){//DIT GAAT VAST STUK HIER
         //hele string outputten en checken of de globSeq nog gelijk i
-        Serial.println(msg);
+        Serial.println(result);
         seq = !seq;
         globSeq++;
       }
+      
+      delay(20);
     }
     else{
       //Radio timeout
@@ -177,7 +184,7 @@ void loop(void){
   else{
     //Backoff timer
     Serial.println(" fail");
-    delay(random(20,50));
+    delay(random(200,500));
   } 
 #endif
 }
