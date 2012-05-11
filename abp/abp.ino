@@ -6,8 +6,8 @@
 #include "printf.h"
 #define channel 67
 //ONLY DEFINE 1
-#define HOP
-//#define SND
+//#define HOP
+#define SND
 //#define RCV
 RF24 radio(3,9);
 uint64_t baseadress = 0x1761d0f640ll;/*doe hier iets mee*/
@@ -20,8 +20,8 @@ uint64_t hopToReceiverAddr = 0x1761d0f64bll; //generateAddress(hopToReceiver);
 uint64_t hopReceiverReadingPipeAddr = 0x1761d0f64cll; //generateAddress(hopReceiverReadingPipe);
 uint64_t hopSenderReadingPipeAddr = 0x1761d0f64dll; //generateAddress(hopSenderReadingPipe);
 
-uint8_t HOP_SENDER = 2;
-uint8_t HOP_RECEIVER = 3;
+uint8_t HOP_SENDER = 1;
+uint8_t HOP_RECEIVER = 2;
 boolean seq = 0;//huidig sequence nummer
 boolean receivedAck = false;  
 unsigned int globSeq = 0;
@@ -34,7 +34,8 @@ void setup(void){
   delay(20);
 
   radio.setChannel(channel);
-  
+  radio.setRetries(15,15);
+  radio.setPayloadSize(32);
 
 #ifdef SND
   radio.openReadingPipe(1, hopToSenderAddr);
@@ -44,12 +45,12 @@ void setup(void){
 #ifdef HOP
   Serial.println("bliep");
   radio.openReadingPipe(HOP_SENDER, hopSenderReadingPipeAddr);
-  radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);\
+  radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);
   radio.openWritingPipe(hopToSenderAddr);
 #endif
 
 #ifdef RCV
-  radio.openReadingPipe(4, hopToReceiverAddr);
+  radio.openReadingPipe(3, hopToReceiverAddr);
   radio.openWritingPipe(hopReceiverReadingPipeAddr);
 #endif
 
@@ -62,17 +63,17 @@ void loop(void){
   boolean ready = false;
   uint64_t sendTo =  0;
   while (!ready){
-    if(radio.available(&HOP_SENDER)){
+    if(radio.available(/*&HOP_SENDER*/)){
       ready = true;
       sendTo = hopToReceiverAddr;
       Serial.println("Got message from sender, sending to receiver");
     }
-
-    if(radio.available(&HOP_RECEIVER)){
-      ready = true;
-      sendTo = hopToSenderAddr;
-      Serial.println("Got message from receiver, sending to sender");
-    }  
+//
+//    if(radio.available(&HOP_RECEIVER)){
+//      ready = true;
+//      sendTo = hopToSenderAddr;
+//      Serial.println("Got message from receiver, sending to sender");
+//    }  
   }
   char readstring[32];
   radio.stopListening();
