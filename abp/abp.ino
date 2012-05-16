@@ -57,37 +57,35 @@ void setup(void){
 
 void loop(void){
 #ifdef HOP //hop
-//  //bool timeout = false;
-//  boolean ready = false;
+  //bool timeout = false;
+  boolean ready = false;
   boolean toSND = false;
-//  //uint64_t sendTo =  0;
-//  while (!ready){
-//    if(radio.available(&HOP_SENDER)){
-//      ready = true;
-//      //sendTo = hopToReceiverAddr;
-//      toSND = false;
-//      Serial.println("Got message from sender, sending to receiver");
-//    }
-//    //
-//    //    if(radio.available(&HOP_RECEIVER)){
-//    //      ready = true;
-//    //      sendTo = hopToSenderAddr;
-//    //      Serial.println("Got message from receiver, sending to sender");
-//    //    }  
-//  }
-//  char readstring[32];
-//  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
-//  Serial.println(readstring);
+  //uint64_t sendTo =  0;
+  while (!ready){
+    if(radio.available(&HOP_SENDER)){
+      ready = true;
+      //sendTo = hopToReceiverAddr;
+      toSND = false;
+      Serial.println("Got message from sender, sending to receiver");
+    }
+    //
+    //    if(radio.available(&HOP_RECEIVER)){
+    //      ready = true;
+    //      sendTo = hopToSenderAddr;
+    //      Serial.println("Got message from receiver, sending to sender");
+    //    }  
+  }
+  char readstring[32];
+  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
+  Serial.println(readstring);
   radio.stopListening();
-  char readstring[] = "Hello";
   if(toSND == false){
     radio.openWritingPipe(hopToReceiverAddr);
     Serial.println("IK GA NAAR RECEIVER");
-    radio.printDetails();
   } else {
     radio.openWritingPipe(hopToSenderAddr); 
   }
-  
+  delay(20);
   boolean sent = radio.write(readstring, 32);
   Serial.println(sent);
   radio.startListening();
@@ -110,17 +108,7 @@ void loop(void){
   radio.stopListening();
   Serial.println(receiveChar);
   //de ack moet ook nog het seq number in die in receiveChar zit
-  boolean timeout = false;
   boolean sent = radio.write(receiveChar, 32);
-  unsigned long started_waiting_at = millis();
-  if(sent){
-    while ( ! radio.available() && !timeout )
-      if (millis() - started_waiting_at > 200 )
-        timeout = true;
-    Serial.println(timeout);
-  }else{
-    Serial.println("Failed to send?");
-  }
   radio.startListening();
   //en weer loop
 #endif
