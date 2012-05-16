@@ -112,12 +112,13 @@ void loop(void){
    
    flip bit
    globseq++;
-   */
-  char msg[32];
-  String msgString = seq == 0 ? "0" : "1";
-  msgString.toCharArray(msg, 32);
+//   */
+//  char msg[32];
+//  String msgString = seq == 0 ? "0" : "1";
+//  msgString.toCharArray(msg, 32);
+  char msg = '1';
   Serial.print(msg);
-  boolean succes = radio.write(&msg, 32);
+  boolean succes = radio.write(&msg, sizeof(char));
   if(succes){
     Serial.println(" succes");
     boolean gotAck = false;
