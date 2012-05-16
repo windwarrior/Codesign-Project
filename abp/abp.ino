@@ -7,8 +7,8 @@
 #define channel 67
 //ONLY DEFINE 1
 //#define HOP
-#define SND
-//#define RCV
+//#define SND
+#define RCV
 RF24 radio(3,9);
 uint64_t baseadress = 0x1761d0f640ll;/*doe hier iets mee*/
 byte hopToSender = 0xab;/*doe hier iets mee*/
@@ -55,6 +55,7 @@ void setup(void){
 #endif
 
   radio.printDetails();
+  radio.startListening();
 }
 
 void loop(void){
@@ -63,42 +64,42 @@ void loop(void){
   boolean ready = false;
   uint64_t sendTo =  0;
   while (!ready){
-    if(radio.available(/*&HOP_SENDER*/)){
+    if(radio.available(&HOP_SENDER)){
       ready = true;
       sendTo = hopToReceiverAddr;
       Serial.println("Got message from sender, sending to receiver");
     }
-//
-//    if(radio.available(&HOP_RECEIVER)){
-//      ready = true;
-//      sendTo = hopToSenderAddr;
-//      Serial.println("Got message from receiver, sending to sender");
-//    }  
+    //
+    //    if(radio.available(&HOP_RECEIVER)){
+    //      ready = true;
+    //      sendTo = hopToSenderAddr;
+    //      Serial.println("Got message from receiver, sending to sender");
+    //    }  
   }
   char readstring[32];
-  radio.stopListening();
   radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
   Serial.println(readstring);
+  radio.stopListening();
+  radio.openWritingPipe(sendTo);
+  radio.write(readstring, 32);
   radio.startListening();
-//  radio.openWritingPipe(sendTo);
-//  radio.write(&readstring, 32);
 #endif 
 
 #ifdef RCV //receiver
   //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
-
-  radio.startListening();
-
   if(radio.available()){
     bool done = false;
     char receiveChar[32];
     while(!done){
-      done = radio.read(&receiveChar, 32);
-      radio.stopListening();
-      //de ack moet ook nog het seq number in die in receiveChar zit
-      boolean sent = radio.write(&receiveChar, radio.getPayloadSize());
+      done = radio.read(receiveChar, 32);
+
     }
+    radio.stopListening();
+    Serial.println(receiveChar);
+    //de ack moet ook nog het seq number in die in receiveChar zit
+    boolean sent = radio.write(&receiveChar, radio.getPayloadSize());
   }
+  radio.startListening();
   //en weer loop
 #endif
 
@@ -112,13 +113,14 @@ void loop(void){
    
    flip bit
    globseq++;
-//   */
-//  char msg[32];
-//  String msgString = seq == 0 ? "0" : "1";
-//  msgString.toCharArray(msg, 32);
-  char msg = '1';
+   */
+  char msg[32];
+  String msgString = seq == 1 ? "0" : "hoi nick";
+  msgString.toCharArray(msg, 32);
+  msg[31] = (char) 0x00;
   Serial.print(msg);
-  boolean succes = radio.write(&msg, sizeof(char));
+  radio.stopListening();
+  boolean succes = radio.write(msg, 32);
   if(succes){
     Serial.println(" succes");
     boolean gotAck = false;
@@ -165,7 +167,6 @@ void loop(void){
           charInCurrentString = 0;
         }
 
-
       }
       //END OF WARNING
       char seqChar = seq == 0 ? '0' : '1';
@@ -179,9 +180,9 @@ void loop(void){
       delay(20);
     }
     else{
-      //Radio timeout
+      delay(20);
+      Serial.println("Resending");
     }
-    radio.startListening();
   }
   else{
     //Backoff timer
@@ -194,6 +195,7 @@ void loop(void){
 uint64_t generateAddress(byte addr){
   return (baseadress & ~0xff) | addr;
 }
+
 
 
 
