@@ -6,15 +6,10 @@
 #include "printf.h"
 #define channel 67
 //ONLY DEFINE 1
-//#define HOP
+#define HOP
 //#define SND
-#define RCV
+//#define RCV
 RF24 radio(3,9);
-uint64_t baseadress = 0x1761d0f640ll;/*doe hier iets mee*/
-byte hopToSender = 0xab;/*doe hier iets mee*/
-byte hopToReceiver = 0xcd; /*doe hier iets mee*/
-byte hopReceiverReadingPipe = 0xef; /*doe hier iets mee*/
-byte hopSenderReadingPipe = 0x33;
 uint64_t hopToSenderAddr = 0x1761d0f64all; //generateAddress(hopToSender);
 uint64_t hopToReceiverAddr = 0x1761d0f64bll; //generateAddress(hopToReceiver);
 uint64_t hopReceiverReadingPipeAddr = 0x1761d0f64cll; //generateAddress(hopReceiverReadingPipe);
@@ -28,7 +23,6 @@ unsigned int globSeq = 0;
 
 void setup(void){
   Serial.begin(57600);
-  Serial.println("BLIEEEEEEP");
   printf_begin();
   radio.begin();
   delay(20);
@@ -38,18 +32,21 @@ void setup(void){
   radio.setPayloadSize(32);
 
 #ifdef SND
+  Serial.println("Sender");
+  printf("Some addr %lu\n\r", hopToReceiverAddr);
   radio.openReadingPipe(1, hopToSenderAddr);
   radio.openWritingPipe(hopSenderReadingPipeAddr);
 #endif
 
 #ifdef HOP
-  Serial.println("bliep");
+  Serial.println("Hop");
   radio.openReadingPipe(HOP_SENDER, hopSenderReadingPipeAddr);
   radio.openReadingPipe(HOP_RECEIVER, hopReceiverReadingPipeAddr);
   radio.openWritingPipe(hopToSenderAddr);
 #endif
 
 #ifdef RCV
+  Serial.println("Receiver");
   radio.openReadingPipe(3, hopToReceiverAddr);
   radio.openWritingPipe(hopReceiverReadingPipeAddr);
 #endif
@@ -60,44 +57,69 @@ void setup(void){
 
 void loop(void){
 #ifdef HOP //hop
-  //bool timeout = false;
-  boolean ready = false;
-  uint64_t sendTo =  0;
-  while (!ready){
-    if(radio.available(&HOP_SENDER)){
-      ready = true;
-      sendTo = hopToReceiverAddr;
-      Serial.println("Got message from sender, sending to receiver");
-    }
-    //
-    //    if(radio.available(&HOP_RECEIVER)){
-    //      ready = true;
-    //      sendTo = hopToSenderAddr;
-    //      Serial.println("Got message from receiver, sending to sender");
-    //    }  
-  }
-  char readstring[32];
-  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
-  Serial.println(readstring);
+//  //bool timeout = false;
+//  boolean ready = false;
+  boolean toSND = false;
+//  //uint64_t sendTo =  0;
+//  while (!ready){
+//    if(radio.available(&HOP_SENDER)){
+//      ready = true;
+//      //sendTo = hopToReceiverAddr;
+//      toSND = false;
+//      Serial.println("Got message from sender, sending to receiver");
+//    }
+//    //
+//    //    if(radio.available(&HOP_RECEIVER)){
+//    //      ready = true;
+//    //      sendTo = hopToSenderAddr;
+//    //      Serial.println("Got message from receiver, sending to sender");
+//    //    }  
+//  }
+//  char readstring[32];
+//  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
+//  Serial.println(readstring);
   radio.stopListening();
-  radio.openWritingPipe(sendTo);
-  radio.write(readstring, 32);
+  char readstring[] = "Hello";
+  if(toSND == false){
+    radio.openWritingPipe(hopToReceiverAddr);
+    Serial.println("IK GA NAAR RECEIVER");
+    radio.printDetails();
+  } else {
+    radio.openWritingPipe(hopToSenderAddr); 
+  }
+  
+  boolean sent = radio.write(readstring, 32);
+  Serial.println(sent);
   radio.startListening();
+  
+  delay(100);
 #endif 
 
 #ifdef RCV //receiver
   //open de juiste pipes hier, deze heeft maar 2 pipes (read/write naar hop)
-  if(radio.available()){
-    bool done = false;
-    char receiveChar[32];
-    while(!done){
-      done = radio.read(receiveChar, 32);
-
+  boolean ready = false;
+  while(!ready){
+    if(radio.available()){
+      ready = true;
     }
-    radio.stopListening();
-    Serial.println(receiveChar);
-    //de ack moet ook nog het seq number in die in receiveChar zit
-    boolean sent = radio.write(&receiveChar, radio.getPayloadSize());
+  }
+  char receiveChar[32];
+      
+  radio.read(&receiveChar, 32);
+     
+  radio.stopListening();
+  Serial.println(receiveChar);
+  //de ack moet ook nog het seq number in die in receiveChar zit
+  boolean timeout = false;
+  boolean sent = radio.write(receiveChar, 32);
+  unsigned long started_waiting_at = millis();
+  if(sent){
+    while ( ! radio.available() && !timeout )
+      if (millis() - started_waiting_at > 200 )
+        timeout = true;
+    Serial.println(timeout);
+  }else{
+    Serial.println("Failed to send?");
   }
   radio.startListening();
   //en weer loop
@@ -192,9 +214,6 @@ void loop(void){
 #endif
 }
 
-uint64_t generateAddress(byte addr){
-  return (baseadress & ~0xff) | addr;
-}
 
 
 
