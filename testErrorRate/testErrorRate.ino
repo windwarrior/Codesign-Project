@@ -5,8 +5,8 @@
 #include "printf.h"
 #define SENDER
 #define timeoutTime 200
-#define HELO "helo"
-#define HACK "hack"
+#define HELO "helo" //handshake
+#define HACK "hack" //handshake ack
 #define PING "ping"
 #define PONG "pong"
 
@@ -14,40 +14,42 @@ RF24 radio(3,9);
 
 #define channel 67
 
-const uint64_t pipes[2] = {
-  0xd250dbcf39LL, 0x4aac2e23feLL};
+const uint64_t pipes[2] = {0xd250dbcf39LL, 0x4aac2e23feLL};
 
 void setup(void){
   Serial.begin(57600);
   printf_begin();
 #ifdef SENDER
-  printf("Will send HELO\n\r");
+  printf("Will send HELO\n\r");  //we are sender
 #else
-  printf("Will listen for HELO\n\r");
+  printf("Will listen for HELO\n\r");  //we are receiver
 #endif
 
   radio.begin();
 
   delay(20);
 
+  //needs to be varied during tests
   radio.setChannel(channel);
   radio.setPALevel(RF24_PA_MIN);
   //radio.setDataRate(RF24_2MBPS);
+  
   radio.setRetries(0,0);
   radio.setAutoAck(false);
   radio.printDetails();
 #ifdef SENDER
   radio.openWritingPipe(pipes[0]);
   radio.openReadingPipe(1,pipes[1]);
-  startSendingHelo();
+  startSendingHelo();//start handshake
 #else
   radio.openWritingPipe(pipes[1]);
   radio.openReadingPipe(1,pipes[0]);
   radio.startListening();
-  startListeningForHelo();
+  startListeningForHelo();//start handshake
 #endif
 }
 
+//START HANDSHAKE
 #ifdef SENDER
 void startSendingHelo(void){
   boolean receivedHACK = false;
@@ -110,7 +112,7 @@ void startListeningForHelo(void){
   }
 }
 #endif
-
+//END HANDSHAKE
 
 void loop(void){
 #ifdef SENDER
