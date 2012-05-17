@@ -164,7 +164,7 @@ void loop(void){
 }
 
 void generatePingMessage(char pingMessageInChar[], int i){
-  String pingMessage = "ping ";
+  String pingMessage = PING;//"ping ";
   pingMessage.concat(i);
   pingMessage.concat(" ");
   pingMessage.concat(millis());

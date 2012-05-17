@@ -57,40 +57,43 @@ void setup(void){
 
 void loop(void){
 #ifdef HOP //hop
-  //bool timeout = false;
-  boolean ready = false;
+//  //bool timeout = false;
+//  boolean ready = false;
   boolean toSND = false;
-  //uint64_t sendTo =  0;
-  while (!ready){
-    if(radio.available(&HOP_SENDER)){
-      ready = true;
-      //sendTo = hopToReceiverAddr;
-      toSND = false;
-      Serial.println("Got message from sender, sending to receiver");
-    }
-    //
-    //    if(radio.available(&HOP_RECEIVER)){
-    //      ready = true;
-    //      sendTo = hopToSenderAddr;
-    //      Serial.println("Got message from receiver, sending to sender");
-    //    }  
-  }
-  char readstring[32];
-  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
-  Serial.println(readstring);
-  radio.stopListening();
+//  //uint64_t sendTo =  0;
+//  while (!ready){
+//    if(radio.available(&HOP_SENDER)){
+//      ready = true;
+//      //sendTo = hopToReceiverAddr;
+//      toSND = false;
+//      Serial.println("Got message from sender, sending to receiver");
+//    }
+//    //
+//    //    if(radio.available(&HOP_RECEIVER)){
+//    //      ready = true;
+//    //      sendTo = hopToSenderAddr;
+//    //      Serial.println("Got message from receiver, sending to sender");
+//    //    }  
+//  }
+//  char readstring[32];
+//  radio.read(&readstring, 32);//TODO reading pipe is niet geopend?
+//  Serial.println(readstring);
+//  radio.stopListening();
   if(toSND == false){
     radio.openWritingPipe(hopToReceiverAddr);
     Serial.println("IK GA NAAR RECEIVER");
   } else {
     radio.openWritingPipe(hopToSenderAddr); 
   }
+  radio.stopListening();
+  radio.printDetails();
+  char readstring[] = "blab";
   delay(20);
   boolean sent = radio.write(readstring, 32);
   Serial.println(sent);
   radio.startListening();
   
-  delay(100);
+  delay(1000);
 #endif 
 
 #ifdef RCV //receiver
