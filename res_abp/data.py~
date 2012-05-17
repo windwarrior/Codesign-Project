@@ -38,8 +38,8 @@ def main():
                 else:
                     result["acked"] = True
         print filter(filterAcked, ping_ack_array)
-        for filtered_item in ping_ack_array#filter(filterMoreThanOneTry, ping_ack_array):
-            print "%d, %d, %d" % (filtered_item["seq"], filtered_item["resend"] - filtered_item["radiofail"], filtered_item["radiofail"])
+        for filtered_item in ping_ack_array:#filter(filterMoreThanOneTry, ping_ack_array):
+            print "Sequence number: %d, Radio timeout: %d, Radio fail: %d" % (filtered_item["seq"], filtered_item["resend"] - filtered_item["radiofail"], filtered_item["radiofail"])
   
 def filterMoreThanOneTry(pingPongDictionairy):
     return pingPongDictionairy["resend"] > 0
