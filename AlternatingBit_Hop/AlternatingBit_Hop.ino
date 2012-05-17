@@ -50,11 +50,11 @@ void loop(void){
     if(radio.available(&pipe))
       if(pipe == SENDER){
           ready = true;
-          toSND = true; //moet false zijn
+          toSND = false; //moet false zijn
           Serial.println("Receiving from SENDER...");
       }else if(pipe == RECEIVER){
           ready = true;
-          toSND = false;//moet true zijn
+          toSND = true;//moet true zijn
           Serial.println("Receiving from RECEIVER...");
       }      
   }

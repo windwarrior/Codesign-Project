@@ -4,12 +4,12 @@
 #include <RF24_config.h>
 #include "printf.h"
 
-//Settings
+//settings
 #define channel 67
 #define payloadSize 8
 RF24 radio(3,9);
 
-//Addresses
+//addresses
 uint64_t senderToHop = 0x1761D0F64Dll;
 uint64_t hopToSender = 0x1761D0F64All;
 
