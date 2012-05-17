@@ -1,0 +1,13 @@
+import os
+import glob
+def main():
+    for infine in glob.glob(os.path.join('','T*')):
+        ping_ack_array = []
+        file = open(infile)
+        print "current file is: " + infile
+        for line in file:
+            if line is None:
+                continue
+            linesplit = line.split(' ')
+            if(linesplit[0] == "Sent":
+                

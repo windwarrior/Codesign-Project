@@ -25,7 +25,7 @@ void setup(void){
   delay(20);
 
   radio.setChannel(channel);
-  radio.setRetries(15,15);
+  radio.setRetries(0,0);
   radio.setPayloadSize(payloadSize);
 
   radio.openReadingPipe(1,hopToSender);
@@ -45,10 +45,10 @@ void loop(void){
   generatePingMessage(msg, seqChar, globSeq);
   msg[31] = (char) 0x00;
   bool isSend = radio.write(msg, 32);
-  
+  Serial.print("Sent package ");
+  Serial.print(msg);
   if(isSend){
-    Serial.print("Sent package ");
-    Serial.println(msg);
+    Serial.println(" succes");
     radio.startListening();
 
     boolean ready = false;
@@ -72,12 +72,17 @@ void loop(void){
       if(result[0] == seqChar){
         seq = !seq;
         globSeq++;
+        
+        if(globSeq == 1000){
+          delay(200);
+          exit(0);
+        }
       }
     }
 
   }
   else{
-    Serial.println("Failed to sent package");
+    Serial.println(" failed");
   }
   radio.startListening();
   delay(100);

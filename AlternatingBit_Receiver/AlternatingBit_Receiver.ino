@@ -20,7 +20,7 @@ void setup(void){
   delay(20);
   
   radio.setChannel(channel);
-  radio.setRetries(15,15);
+  radio.setRetries(0,0);
   radio.setPayloadSize(payloadSize);
   
   radio.openReadingPipe(1, hopToReceiver);
