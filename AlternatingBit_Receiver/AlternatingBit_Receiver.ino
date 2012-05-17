@@ -6,7 +6,7 @@
 
 //Settings
 #define channel 67
-#define payloadSize 8
+#define payloadSize 32
 RF24 radio(3,9);
 
 //Adresses
@@ -40,22 +40,22 @@ void loop(void){
     }
   }
 
-  char readChar;
-  boolean isRead = radio.read(&readChar, sizeof(char));
+  char msg[32];
+  boolean isRead = radio.read(&msg, 32);
 
   Serial.println("---------------------------");
   Serial.print("Message received: ");
-  Serial.println(readChar);  
+  Serial.println(msg);  
   radio.stopListening();
   if(isRead){
-    boolean isSend = radio.write(&readChar, sizeof(char));
-    if(isSend){
+    char blab[] = "Haaiii";
+    boolean isSend = radio.write(blab, 32);
+    if(!isSend){
       Serial.println("Failed to send the char");
     }
   }else{
      Serial.println("Failed to read the buffer");
   }
   radio.startListening();
-  Serial.println("----------------------------");
  
 }
