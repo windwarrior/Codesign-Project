@@ -54,7 +54,7 @@ void loop(void){
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     while ( ! radio.available() && !timeout )
-      if (millis() - started_waiting_at > 200 )
+      if (millis() - started_waiting_at > 1000 )
         timeout = true;
         
     if(timeout){
