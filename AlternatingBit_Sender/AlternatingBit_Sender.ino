@@ -41,11 +41,11 @@ void loop(void){
   radio.stopListening();
   Serial.println("----------------------------");
   char msg[32];
-  String msgString = "hello";
-  msgString.toCharArray(msg,32);
+  char seqChar = seq ? '1' : '0';
+  generatePingMessage(msg, seqChar, globSeq);
   msg[31] = (char) 0x00;
   bool isSend = radio.write(msg, 32);
-
+  
   if(isSend){
     Serial.print("Sent package ");
     Serial.println(msg);
@@ -68,6 +68,11 @@ void loop(void){
 
       Serial.print("Got message: ");
       Serial.println(result);
+      
+      if(result[0] == seqChar){
+        seq = !seq;
+        globSeq++;
+      }
     }
 
   }
@@ -78,6 +83,16 @@ void loop(void){
   delay(100);
 
 }
+
+void generatePingMessage(char pingMessageInChar[], char abc, int globSeq){
+  String pingMessage = "";//"ping ";
+  pingMessage.concat(abc);
+  pingMessage.concat(" PNG ");
+  pingMessage.concat(globSeq);
+  pingMessage.toCharArray(pingMessageInChar, 32);
+}
+
+
 
 
 

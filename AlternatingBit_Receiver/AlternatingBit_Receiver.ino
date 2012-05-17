@@ -48,8 +48,10 @@ void loop(void){
   Serial.println(msg);  
   radio.stopListening();
   if(isRead){
-    char blab[] = "Haaiii";
-    boolean isSend = radio.write(blab, 32);
+    msg[2] = 'A';
+    msg[3] = 'C';
+    msg[4] = 'K';
+    boolean isSend = radio.write(msg, 32);
     if(!isSend){
       Serial.println("Failed to send the char");
     }
