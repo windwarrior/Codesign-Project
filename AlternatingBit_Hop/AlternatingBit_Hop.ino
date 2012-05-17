@@ -6,7 +6,7 @@
 
 //settings
 #define channel 67
-#define payloadSize 8
+#define payloadSize 32
 RF24 radio(3,9);
 
 //reading addresses
@@ -60,8 +60,8 @@ void loop(void){
   }
   
   //start reading
-  char readString;
-  boolean isRead = radio.read(&readString, sizeof(char));
+  char readString[32];
+  boolean isRead = radio.read(&readString, 32);
   
   Serial.print("Bool read: ");
   Serial.println(isRead);
@@ -79,7 +79,7 @@ void loop(void){
     Serial.println("Writing to RECEIVER...");
   }
   delay(20);
-  boolean isSend = radio.write(&readString, sizeof(char));
+  boolean isSend = radio.write(readString, 32);
   Serial.print("Bool write: ");
   Serial.println(isSend);
   
