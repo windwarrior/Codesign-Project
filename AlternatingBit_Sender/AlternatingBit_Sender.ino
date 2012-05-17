@@ -72,6 +72,11 @@ void loop(void){
       if(result[0] == seqChar){
         seq = !seq;
         globSeq++;
+        
+        if(globSeq == 1000){
+          delay(200);
+          exit(0);
+        }
       }
     }
 

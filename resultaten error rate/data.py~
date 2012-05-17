@@ -33,7 +33,7 @@ def main():
         #print map(calculateRTT, pingPongDict)
         avg = calculateAvgRTT(pingPongDict)
         if avg > 0:
-            print "Average RTT: " + avg
+            print "Average RTT: " + str(avg)
                 
 def listFunction(pingPongDict):
     return pingPongDict["ponged"]
