@@ -3,17 +3,6 @@ boolean isMaster = true;
 
 char linear = 'l';
 char squared = 's';
-#define SOUND
-/**
-* Deze schets hebben we gebruikt om ons algoritme te kunnen testen
-* in de loop functie kunnen doTests aangeroepen worden, met een aantal argumenten
-*
-* Verder hebben we voor de test met de ledjes een driekleuren led gebruikt, deze code
-* gaat uit van een led die net zo fel is, maar slechts 1 aansluiting heeft.
-*
-* De microfoon is gecalibreerd op ~510 (analogRead) als baseline, terwijl bij de leds uitgegaan
-* is van een onverlichte ruimte, en voldoende sterke leds.
-**/
 
 void setup(void){
   Serial.begin(9600);
@@ -85,15 +74,11 @@ void doTest(char type, float functionargument, int lswAmount, int flashes){
       i = i + newClock - currentClock;
       currentClock = newClock;
     }
-    flash();
+    digitalWrite(13, HIGH);
+    Serial.println("Blinking");
+    delay(20);
+    digitalWrite(13, LOW);
   }
-}
-
-void flash(){
-  digitalWrite(13, HIGH);
-  Serial.println("Blinking");
-  delay(20);
-  digitalWrite(13, LOW);
 }
 
 void doDelay(int del){
@@ -114,13 +99,8 @@ int calculateNewTimeSquared(int i, float constant){
   return (int)(constant * i * i);
 }
 
-#ifdef SOUND
 boolean hasFlashed(int read){
-  return read < 480 || read > 540;
+  return read < 480 || read > 540; //voor geluid
+  //return read > 100; //voor licht
 }
-#else
-boolean hasFlashed(int read){
-  return read > 200; 
-}
-#endif
 
