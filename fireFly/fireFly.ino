@@ -1,5 +1,4 @@
 int flashes = 0;
-boolean toggle = false;
 boolean isMaster = true;
 
 char linear = 'l';
@@ -11,6 +10,11 @@ void setup(void){
   pinMode(13, OUTPUT);
   pinMode(12, OUTPUT);
 
+
+  digitalWrite(12, HIGH);
+  delay(100);
+  digitalWrite(12, LOW);
+  
   pinMode(3, INPUT);
 
 }
@@ -18,8 +22,12 @@ void setup(void){
 void loop(){
 //  doTest(linear, 1.1, 30, 10);
 //  doDelay(2500);
-  
-  doTest(squared, (1.0f/5000.0f), 30, 30);
+   doTest(linear, 1.2, 30, 10);
+   
+   doDelay(3000);
+   
+   doTest(linear, 1.2, 5, 40);  
+//  doTest(squared, (1.0f/5000.0f), 30, 30);
 //  doTest(squared, (1/2500), 30, 10);
 //  doDelay(1000);
 //  doTest(squared, (1/5000), 30, 10);
@@ -88,10 +96,11 @@ int calculateNewTimeLinear(int i, float constant){
 
 
 int calculateNewTimeSquared(int i, float constant){
-  return (int)(constant * i * i + i);
+  return (int)(constant * i * i);
 }
 
 boolean hasFlashed(int read){
-  return read < 480 || read > 540;
+  return read < 480 || read > 540; //voor geluid
+  //return read > 100; //voor licht
 }
 
