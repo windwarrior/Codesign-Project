@@ -1,0 +1,255 @@
+
+STATUS		 = 0x0e RX_DR=0 TX_DS=0 MAX_RT=0 RX_P_NO=7 TX_FULL=0
+RX_ADDR_P0-1	= 0xd250dbcf39 0x4aac2e23fe
+RX_ADDR_P2-5	= 0xc3 0xc4 0xc5 0xc6
+TX_ADDR		 = 0xd250dbcf39
+RX_PW_P0-6	= 0x20 0x20 0x00 0x00 0x00 0x00
+EN_AA		 = 0x00
+EN_RXADDR	= 0x03
+RF_CH		 = 0x00
+RF_SETUP	 = 0x07
+CONFIG		 = 0x0f
+DYNPD/FEATURE	= 0x00 0x00
+
+Data Rate	 = 1MBPS
+Model		 = nRF24L01+
+CRC Length	 = 16 bits
+PA Power	 = PA_HIGH
+
+
+
+
+
+Handshake done!
+ping 0 19805
+pong 0 19805
+ping 1 19908
+pong 1 19908
+ping 2 20012
+pong 2 20012
+ping 3 20116
+pong 3 20116
+ping 4 20219
+pong 4 20219
+ping 5 20323
+pong 5 20323
+ping 6 20427
+pong 6 20427
+ping 7 20531
+pong 7 20531
+ping 8 20634
+pong 8 20634
+ping 9 20739
+timeout ACK 9
+
+ping 10 21043
+timeout ACK 10
+
+ping 11 21347
+pong 11 21347
+ping 12 21450
+timeout ACK 12
+
+ping 13 21753
+pong 13 21753
+ping 14 21857
+timeout ACK 14
+
+ping 15 22160
+pong 15 22160
+ping 16 22263
+pong 16 22263
+ping 17 22368
+pong 17 22368
+ping 18 22471
+pong 18 22471
+ping 19 22575
+pong 19 22575
+ping 20 22679
+timeout ACK 20
+
+ping 21 22982
+timeout ACK 21
+
+ping 22 23285
+pong 22 23285
+ping 23 23389
+pong 23 23389
+ping 24 23492
+timeout ACK 24
+
+ping 25 23796
+pong 25 23796
+ping 26 23900
+pong 26 23900
+ping 27 24004
+pong 27 24004
+ping 28 24108
+timeout ACK 28
+
+ping 29 24412
+pong 29 24412
+ping 30 24515
+timeout ACK 30
+
+ping 31 24818
+pong 31 24818
+ping 32 24922
+pong 32 24922
+ping 33 25025
+pong 33 25025
+ping 34 25129
+timeout ACK 34
+
+ping 35 25434
+timeout ACK 35
+
+ping 36 25738
+timeout ACK 36
+
+ping 37 26042
+pong 37 26042
+ping 38 26145
+pong 38 26145
+ping 39 26249
+pong 39 26249
+ping 40 26353
+pong 40 26353
+ping 41 26457
+timeout ACK 41
+
+ping 42 26761
+timeout ACK 42
+
+ping 43 27065
+timeout ACK 43
+
+ping 44 27368
+pong 44 27368
+ping 45 27471
+timeout ACK 45
+
+ping 46 27776
+timeout ACK 46
+
+ping 47 28080
+timeout ACK 47
+
+ping 48 28384
+pong 48 28384
+ping 49 28487
+pong 49 28487
+ping 50 28591
+pong 50 28591
+ping 51 28695
+pong 51 28695
+ping 52 28798
+pong 52 28798
+ping 53 28903
+pong 53 28903
+ping 54 29006
+timeout ACK 54
+
+ping 55 29309
+timeout ACK 55
+
+ping 56 29614
+pong 56 29614
+ping 57 29717
+pong 57 29717
+ping 58 29821
+pong 58 29821
+ping 59 29925
+pong 59 29925
+ping 60 30028
+timeout ACK 60
+
+ping 61 30331
+timeout ACK 61
+
+ping 62 30635
+pong 62 30635
+ping 63 30738
+pong 63 30738
+ping 64 30842
+pong 64 30842
+ping 65 30946
+timeout ACK 65
+
+ping 66 31249
+pong 66 31249
+ping 67 31352
+timeout ACK 67
+
+ping 68 31655
+pong 68 31655
+ping 69 31759
+timeout ACK 69
+
+ping 70 32062
+pong 70 32062
+ping 71 32165
+pong 71 32165
+ping 72 32270
+pong 72 32270
+ping 73 32373
+pong 73 32373
+ping 74 32477
+pong 74 32477
+ping 75 32581
+pong 75 32581
+ping 76 32685
+pong 76 32685
+ping 77 32788
+pong 77 32788
+ping 78 32892
+pong 78 32892
+ping 79 32996
+pong 79 32996
+ping 80 33099
+pong 80 33099
+ping 81 33204
+pong 81 33204
+ping 82 33307
+pong 82 33307
+ping 83 33411
+pong 83 33411
+ping 84 33515
+timeout ACK 84
+
+ping 85 33818
+timeout ACK 85
+
+ping 86 34121
+pong 86 34121
+ping 87 34225
+pong 87 34225
+ping 88 34328
+pong 88 34328
+ping 89 34433
+timeout ACK 89
+
+ping 90 34737
+pong 90 34737
+ping 91 34840
+pong 91 34840
+ping 92 34945
+timeout ACK 92
+
+ping 93 35249
+timeout ACK 93
+
+ping 94 35553
+timeout ACK 94
+
+ping 95 35856
+pong 95 35856
+ping 96 35959
+timeout ACK 96
+
+ping 97 36262
+pong 97 36262
+ping 98 36366
+pong 98 36366
+ping 99 36470
+timeout ACK 99

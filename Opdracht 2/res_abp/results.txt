@@ -1,0 +1,76 @@
+current file is: betterTest_2_random_disconnects
+[]
+Sequence number: 27, Radio timeout: 1, Radio fail: 1
+Sequence number: 66, Radio timeout: 2, Radio fail: 0
+Sequence number: 84, Radio timeout: 2, Radio fail: 0
+Sequence number: 85, Radio timeout: 0, Radio fail: 1
+Sequence number: 86, Radio timeout: 0, Radio fail: 2
+Sequence number: 107, Radio timeout: 0, Radio fail: 1
+Sequence number: 147, Radio timeout: 1, Radio fail: 0
+Sequence number: 205, Radio timeout: 4, Radio fail: 36
+Sequence number: 250, Radio timeout: 1, Radio fail: 0
+Sequence number: 320, Radio timeout: 0, Radio fail: 1
+Sequence number: 329, Radio timeout: 2, Radio fail: 0
+Sequence number: 348, Radio timeout: 3, Radio fail: 0
+Sequence number: 360, Radio timeout: 1, Radio fail: 0
+Sequence number: 439, Radio timeout: 3, Radio fail: 5
+Sequence number: 450, Radio timeout: 1, Radio fail: 0
+Sequence number: 452, Radio timeout: 1, Radio fail: 0
+Sequence number: 477, Radio timeout: 1, Radio fail: 0
+Sequence number: 491, Radio timeout: 1, Radio fail: 0
+Sequence number: 492, Radio timeout: 1, Radio fail: 0
+Sequence number: 494, Radio timeout: 1, Radio fail: 0
+Sequence number: 504, Radio timeout: 1, Radio fail: 1
+Sequence number: 605, Radio timeout: 5, Radio fail: 59
+Sequence number: 612, Radio timeout: 0, Radio fail: 1
+Sequence number: 617, Radio timeout: 0, Radio fail: 1
+Sequence number: 620, Radio timeout: 3, Radio fail: 0
+Sequence number: 655, Radio timeout: 0, Radio fail: 1
+Sequence number: 676, Radio timeout: 2, Radio fail: 0
+Sequence number: 677, Radio timeout: 2, Radio fail: 0
+Sequence number: 687, Radio timeout: 1, Radio fail: 0
+Sequence number: 690, Radio timeout: 1, Radio fail: 0
+Sequence number: 700, Radio timeout: 0, Radio fail: 1
+Sequence number: 702, Radio timeout: 1, Radio fail: 1
+Sequence number: 704, Radio timeout: 1, Radio fail: 0
+Sequence number: 719, Radio timeout: 0, Radio fail: 1
+Sequence number: 726, Radio timeout: 1, Radio fail: 0
+Sequence number: 728, Radio timeout: 1, Radio fail: 0
+Sequence number: 737, Radio timeout: 2, Radio fail: 0
+Sequence number: 741, Radio timeout: 1, Radio fail: 0
+Sequence number: 742, Radio timeout: 1, Radio fail: 0
+Sequence number: 748, Radio timeout: 1, Radio fail: 0
+Sequence number: 753, Radio timeout: 1, Radio fail: 0
+Sequence number: 806, Radio timeout: 0, Radio fail: 1
+Sequence number: 817, Radio timeout: 1, Radio fail: 0
+Sequence number: 852, Radio timeout: 0, Radio fail: 1
+Sequence number: 883, Radio timeout: 0, Radio fail: 1
+Sequence number: 909, Radio timeout: 0, Radio fail: 1
+Sequence number: 913, Radio timeout: 2, Radio fail: 0
+Sequence number: 917, Radio timeout: 1, Radio fail: 0
+Sequence number: 924, Radio timeout: 1, Radio fail: 0
+Sequence number: 955, Radio timeout: 2, Radio fail: 0
+Sequence number: 958, Radio timeout: 2, Radio fail: 0
+Sequence number: 959, Radio timeout: 0, Radio fail: 2
+Sequence number: 974, Radio timeout: 2, Radio fail: 0
+Sequence number: 993, Radio timeout: 1, Radio fail: 0
+current file is: betterTest_1_normale_omstandigheden
+[]
+Sequence number: 31, Radio timeout: 1, Radio fail: 0
+Sequence number: 58, Radio timeout: 1, Radio fail: 0
+Sequence number: 69, Radio timeout: 1, Radio fail: 0
+Sequence number: 70, Radio timeout: 0, Radio fail: 1
+Sequence number: 74, Radio timeout: 0, Radio fail: 1
+Sequence number: 77, Radio timeout: 1, Radio fail: 0
+Sequence number: 79, Radio timeout: 5, Radio fail: 0
+Sequence number: 632, Radio timeout: 2, Radio fail: 0
+current file is: betterTest_1_normale_omstandigheden_mank
+[{'radiofail': 0, 'acked': False, 'seq': 7, 'resend': 0}]
+Sequence number: 31, Radio timeout: 1, Radio fail: 0
+Sequence number: 58, Radio timeout: 1, Radio fail: 0
+Sequence number: 69, Radio timeout: 1, Radio fail: 0
+Sequence number: 70, Radio timeout: 0, Radio fail: 1
+Sequence number: 74, Radio timeout: 0, Radio fail: 1
+Sequence number: 77, Radio timeout: 1, Radio fail: 0
+Sequence number: 79, Radio timeout: 5, Radio fail: 0
+Sequence number: 632, Radio timeout: 2, Radio fail: 0

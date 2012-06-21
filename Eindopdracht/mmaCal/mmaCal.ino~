@@ -1,0 +1,141 @@
+#include <I2C.h>
+#include <MMA8452Q.h>
+#include <MMA845.h>
+
+MMA845 mma;
+
+int xCenter, yCenter, zCenter = 0;
+
+int xGain, yGain, zGain = 0;
+
+int iterations = 20;
+
+enum Direction {
+  LEFT,
+  RIGHT,
+  FORWARD,
+  BACK,
+  NONE
+}
+
+void setup(){
+  mma.begin();
+  Serial.begin(115200);
+  delay(2000);
+  calibrate();
+}
+
+void calibrate(){
+
+
+  int xTot, yTot, zTot = 0;
+
+  int xMin, yMin, zMin = 5000;
+  int xMax, yMax, zMax = 0;
+
+  /* DO NOT REMOVE */
+  Serial.print(xTot);
+  Serial.print(" ");
+  Serial.print(yTot);
+  Serial.print(" ");
+  Serial.println(zTot);
+  /* REALLY DON'T */ 
+ 
+  for(int i = 0; i<iterations; i++){
+    int x, y, z = 0;
+    mma.getAccXYZ(&x,&y,&z);
+    xTot = xTot + map(x, -512, 511, 0, 1023);
+    yTot = yTot + map(y, -512, 511, 0, 1023);
+    zTot = zTot + map(z, -512, 511, 0, 1023);
+    Serial.print("xTot: ");
+    Serial.print(xTot);
+    Serial.print(" x: ");
+    Serial.print(x);
+    Serial.print(" xMap: ");
+    Serial.println(map(x, -512, 511, 0, 1023));
+    Serial.print("yTot:");
+    Serial.print(yTot);
+    Serial.print(" y: ");
+    Serial.print(y);
+    Serial.print(" yMap: ");
+    Serial.println(map(y, -512, 511, 0, 1023));
+    Serial.print("zTot:");
+    Serial.print(zTot);
+    Serial.print(" z: ");
+    Serial.print(z);
+    Serial.print(" zMap: ");
+    Serial.println(map(z, -512, 511, 0, 1023));
+    Serial.println("--------------------------");
+    delay(20);
+
+    xMin = min(x, xMin);
+    yMin = min(y, yMin);
+    zMin = min(z, zMin);
+
+    xMax = max(x, xMax);
+    yMax = max(y, yMax);
+    zMax = max(z, zMax);
+
+
+  }
+
+  xCenter = map(xTot / iterations, 0, 1023, -512, 512);
+  yCenter = map(yTot / iterations, 0, 1023, -512, 512);
+  zCenter = map(zTot / iterations, 0, 1023, -512, 512);
+
+  xGain = xMax - xMin;
+  yGain = yMax - yMin;
+  zGain = zMax - zMin;
+
+  Serial.print("Calibrated, x center: ");
+  Serial.print(xCenter);
+  Serial.print(" y center: ");
+  Serial.print(yCenter);
+  Serial.print(" z center ");
+  Serial.println(zCenter);
+  Serial.print("Gain, x gain: ");
+  Serial.print(xGain);
+  Serial.print(" y gain: ");
+  Serial.print(yGain);
+  Serial.print(" z gain: ");
+  Serial.println(zGain);
+  delay(20);
+}
+
+void loop(){
+
+  int x, y, z = 0;
+  mma.getAccXYZ(&x,&y,&z);
+  Serial.print("x: ");
+  Serial.print(x);
+  Serial.print(" xCorr: ");
+  Serial.print(x - xCenter);
+  Serial.print(" y: ");
+  Serial.print(y);
+  Serial.print(" yCorr: ");
+  Serial.print(y - yCenter);
+  Serial.print(" ");
+  Serial.print(z);
+  Serial.print(" zCorr: ");
+  Serial.print(z - zCenter);
+  Serial.println(getDirection(x - xCenter, y - yCenter);
+  delay(20);
+}
+
+Direction getDirection(int x, int y){
+  if(x > 200){
+    return Direction.RIGHT;
+  }else if(x < -200){
+    return Direction.LEFT;
+  }else if(y > 200){
+    return Direction.FORWARD;
+  }else if(y < -200){
+    return Direction.BACK;
+  }else{
+    return Direction.NONE;
+  }
+}
+
+
+
+
