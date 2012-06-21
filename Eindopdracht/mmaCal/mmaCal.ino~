@@ -1,83 +1,107 @@
 #include <I2C.h>
 #include <MMA8452Q.h>
 #include <MMA845.h>
+#include "mmaCal.h"
+#include <RF24.h>
+#include "printf.h"
+#include <nRF24L01.h>
+#include <RF24_config.h>
 
+//#define debug
 MMA845 mma;
+RF24 radio(3,9);
 
-int xCenter, yCenter, zCenter = 0;
+const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
 
-int xGain, yGain, zGain = 0;
+const int channel = 67;
+
+int xCenter = 0, yCenter = 0, zCenter = 0;
+
+int xGain = 0, yGain = 0, zGain = 0;
 
 int iterations = 20;
 
-enum Direction {
-  LEFT,
-  RIGHT,
-  FORWARD,
-  BACK,
-  NONE
-}
 
 void setup(){
+  pinMode(13, OUTPUT);
   mma.begin();
   Serial.begin(115200);
   delay(2000);
   calibrate();
+  setupRadio();
+}
+
+void setupRadio(){
+  radio.begin();
+  delay(20);
+  radio.setChannel(channel);
+  radio.setRetries(15,15);
+  radio.setPayloadSize(8);
+
+  radio.openWritingPipe(pipes[0]);
+  
+  //TODO: afvragen  of dit strict noodzakelijk is
+  radio.openReadingPipe(pipes[1]);
+
+  radio.startListening();
+
+  radio.printDetails();
 }
 
 void calibrate(){
 
 
-  int xTot, yTot, zTot = 0;
+  int xTot = 0, yTot = 0, zTot = 0;
 
-  int xMin, yMin, zMin = 5000;
-  int xMax, yMax, zMax = 0;
-
-  /* DO NOT REMOVE */
-  Serial.print(xTot);
-  Serial.print(" ");
-  Serial.print(yTot);
-  Serial.print(" ");
-  Serial.println(zTot);
-  /* REALLY DON'T */ 
- 
+  int xMin = 5000, yMin = 5000,  zMin = 5000;
+  
+  int xMax = 0, yMax = 0, zMax = 0;
+  
+  digitalWrite(13, HIGH);
   for(int i = 0; i<iterations; i++){
-    int x, y, z = 0;
+    int x = 0 , y =  0, z = 0;
     mma.getAccXYZ(&x,&y,&z);
-    xTot = xTot + map(x, -512, 511, 0, 1023);
-    yTot = yTot + map(y, -512, 511, 0, 1023);
-    zTot = zTot + map(z, -512, 511, 0, 1023);
+    x = map(x, -512, 511, 0, 1023);
+    y = map(y, -512, 511, 0, 1023);
+    z = map(z, -512, 511, 0, 1023);
+    xTot = xTot + x;
+    yTot = yTot + y;
+    zTot = zTot + z;
+    #ifdef debug
     Serial.print("xTot: ");
     Serial.print(xTot);
     Serial.print(" x: ");
     Serial.print(x);
-    Serial.print(" xMap: ");
-    Serial.println(map(x, -512, 511, 0, 1023));
-    Serial.print("yTot:");
+    Serial.print("yTot: ");
     Serial.print(yTot);
     Serial.print(" y: ");
     Serial.print(y);
-    Serial.print(" yMap: ");
-    Serial.println(map(y, -512, 511, 0, 1023));
-    Serial.print("zTot:");
+    Serial.print("zTot: ");
     Serial.print(zTot);
     Serial.print(" z: ");
     Serial.print(z);
-    Serial.print(" zMap: ");
-    Serial.println(map(z, -512, 511, 0, 1023));
-    Serial.println("--------------------------");
-    delay(20);
+    #endif
+    delay(100);
 
     xMin = min(x, xMin);
     yMin = min(y, yMin);
     zMin = min(z, zMin);
-
+    #ifdef debug
+    Serial.print(" xMin: ");
+    Serial.print(xMin);
+    Serial.print(" yMin: ");
+    Serial.print(yMin);
+    Serial.print(" zMin: ");
+    Serial.println(zMin);    
+    Serial.println("--------------------------");
+    #endif
     xMax = max(x, xMax);
     yMax = max(y, yMax);
     zMax = max(z, zMax);
 
 
   }
+  digitalWrite(13, LOW);
 
   xCenter = map(xTot / iterations, 0, 1023, -512, 512);
   yCenter = map(yTot / iterations, 0, 1023, -512, 512);
@@ -106,6 +130,7 @@ void loop(){
 
   int x, y, z = 0;
   mma.getAccXYZ(&x,&y,&z);
+  #ifdef debug
   Serial.print("x: ");
   Serial.print(x);
   Serial.print(" xCorr: ");
@@ -118,23 +143,60 @@ void loop(){
   Serial.print(z);
   Serial.print(" zCorr: ");
   Serial.print(z - zCenter);
-  Serial.println(getDirection(x - xCenter, y - yCenter);
+  Serial.print(" dir: " );
+  #endif
+  Direction dir = getDirection(x - xCenter, y - yCenter);
+  if(dir == FORWARD){
+    Serial.println("Forward" );
+  }else if(dir == BACK){
+    Serial.println("Back" );
+  }else if(dir == LEFT){
+    Serial.println("Left" );
+  }else if(dir == RIGHT){
+    Serial.println("Right" );
+  }else{
+    Serial.println("None");
+  }
+
+  sendDirection(dir, 0);
+
   delay(20);
 }
 
 Direction getDirection(int x, int y){
-  if(x > 200){
-    return Direction.RIGHT;
+  if(x > 200){);
+    return FORWARD;
   }else if(x < -200){
-    return Direction.LEFT;
+    return BACK;
   }else if(y > 200){
-    return Direction.FORWARD;
+    return RIGHT;
   }else if(y < -200){
-    return Direction.BACK;
+    return LEFT;
   }else{
-    return Direction.NONE;
+    return NONE;
   }
 }
+
+void generateMessage(char message[], int direction, int amount){
+  String myString = "";
+  myString.concat(direction);
+  myString.concat(" ");
+  myString.concat(amount);
+  myString.toCharArray(pingMessageInChar, 32);
+}
+
+void sendDirection(int dir, int val){
+  char message[32];
+  generatePingMessage(message, dir, 0);
+
+  bool isSend = false;
+  int i = 0;
+  while(!isSend && i < retries){
+    bool isSend = radio.write(message, 32);
+    i++;
+  }
+}
+
 
 
 

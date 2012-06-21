@@ -2,9 +2,20 @@
 #include <MMA8452Q.h>
 #include <MMA845.h>
 #include "mmaCal.h"
+#include <RF24.h>
+#include <SPI.h>
+#include "printf.h"
+#include <nRF24L01.h>
+#include <RF24_config.h>
+
 //#define debug
 MMA845 mma;
+RF24 radio(3,9);
 
+const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
+
+const int channel = 67;
+const int retries = 5;
 int xCenter = 0, yCenter = 0, zCenter = 0;
 
 int xGain = 0, yGain = 0, zGain = 0;
@@ -18,6 +29,24 @@ void setup(){
   Serial.begin(115200);
   delay(2000);
   calibrate();
+  setupRadio();
+}
+
+void setupRadio(){
+  radio.begin();
+  delay(20);
+  radio.setChannel(channel);
+  radio.setRetries(15,15);
+  radio.setPayloadSize(8);
+
+  radio.openWritingPipe(pipes[0]);
+  
+  //TODO: afvragen  of dit strict noodzakelijk is
+  radio.openReadingPipe(pipes[1], 1);
+
+  radio.startListening();
+
+  radio.printDetails();
 }
 
 void calibrate(){
@@ -129,6 +158,9 @@ void loop(){
   }else{
     Serial.println("None");
   }
+
+  sendDirection(dir, 0);
+
   delay(20);
 }
 
@@ -145,6 +177,27 @@ Direction getDirection(int x, int y){
     return NONE;
   }
 }
+
+void generateMessage(char message[], int direction, int amount){
+  String myString = "";
+  myString.concat(direction);
+  myString.concat(" ");
+  myString.concat(amount);
+  myString.toCharArray(message, 32);
+}
+
+void sendDirection(int dir, int val){
+  char message[32];
+  generateMessage(message, dir, val);
+
+  bool isSend = false;
+  int i = 0;
+  while(!isSend && i < retries){
+    bool isSend = radio.write(message, 32);
+    i++;
+  }
+}
+
 
 
 
