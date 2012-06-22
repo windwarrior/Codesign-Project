@@ -1,11 +1,11 @@
 #ifndef Morse_h
 #define Morse_h
 #include "Arduino.h"
-#include <Servo.h>
+#include <Servo.h> //Mag dit zo ?
 
 class SpiderController{
     public:
-        SpiderController(int leftpin, int middlepin, int right);
+        SpiderController(int leftpin, int middlepin, int rightpin);
         void turnLeft();
         void turnRight();
         void forward();
