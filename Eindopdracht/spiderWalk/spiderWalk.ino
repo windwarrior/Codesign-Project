@@ -28,7 +28,7 @@ int rangeLeft = range;
 int rangeRight = range;
 
 int posLeft = leftMin + (range/2);
-int posMiddle = midMin + (range/2);
+int posMiddle = midMin + ((midMax-midMin)/2);
 int posRight = rightMin + (range/2);
 
 void setup()
@@ -43,7 +43,7 @@ void setup()
 void loop()
 {
  //forward();
- turnRight();
+ turnLeft();
  //left.write(120);
 }
 
@@ -113,18 +113,18 @@ void turn(int side){
 }
 
 void sweepFromTo(Servo serv, int from, int to){
-  int start = millis();
-  int duration = 500;
   if(from > to){
     for(int i = from; i > to; i--){
       serv.write(i);
       delay(5);
     }
+    serv.write(to);
   }else{
     for(int i = from; i < to; i++){
       serv.write(i);
       delay(5);
     }
+    serv.write(to);
   }
 }
 
