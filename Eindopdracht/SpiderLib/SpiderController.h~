@@ -43,6 +43,5 @@ class SpiderController{
         int rightMin;
         int rightCenter;
         int rightMax;
-        int rightPos;
 };
 #endif

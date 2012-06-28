@@ -133,7 +133,7 @@ void SpiderController::sweepFromTo(Motor mot, int to)
   
 }
 
-void SpiderController::turn(int side){
+void SpiderController::turn(int side){/*
   if(side == TURN_LEFT){
     sweepFromTo(middle, posMiddle, midMin);
     posMiddle = midMin;
@@ -162,5 +162,5 @@ void SpiderController::turn(int side){
   sweepTwo(left, posLeft, rangeLeft, right, posRight, rangeRight);
   posLeft = posLeft + rangeLeft;
   posRight = posRight + rangeRight;
-  delay(500);
+  delay(500);*/
 }
