@@ -1,5 +1,5 @@
-#ifndef SpiderController
-#define SpiderController
+#ifndef _SPIDER_H_
+#define _SPIDER_H_
 #include "Arduino.h"
 #include <Motor.h>
 
@@ -19,10 +19,10 @@ class SpiderController{
         void calibrate(Motor mot, int center, int range);     
     private:
         void sweepTwo(Motor mot1, int range1, Motor mot2, int range2);
-        void sweepFromTo(Motor mot, int from, int to);
-        void turn(int side);
+        void sweepFromTo(Motor mot, int to);
+        void turn(Turn side);
         Motor _left;
-        Motor _center;
+        Motor _middle;
         Motor _right;   
 };
 #endif

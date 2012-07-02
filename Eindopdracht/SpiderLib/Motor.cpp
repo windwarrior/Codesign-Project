@@ -2,7 +2,7 @@
 #include "Servo.h"
 #include "Motor.h"
 
-void Motor::Motor(){
+Motor::Motor(){
 
 }
 
@@ -13,8 +13,8 @@ void Motor::calibrate(int center, int range){
 }
 
 void Motor::write(int value){    
-    _value = value;
-    _serv.write(value);
+    _position = value;
+    _servo.write(value);
 }
 
 int Motor::getPosition(){
@@ -37,4 +37,7 @@ void Motor::attach(int pin){
     _servo.attach(pin);
 }
 
+void Motor::reset(){
+    write(_center);
+}
     

@@ -1,11 +1,11 @@
-#ifndef Motor
-#define Motor
+#ifndef _MOTOR_H_
+#define _MOTOR_H_
 #include "Arduino.h"
 #include "Servo.h"
 
 class Motor{
     public:
-        Motor(Motor*);
+        Motor();
         void calibrate(int center, int range);
         void write(int value);
         int getPosition();
@@ -13,12 +13,13 @@ class Motor{
         int getCenter();
         int getMax();
         void attach(int pin);
+        void reset();
     private:
-        Servo _serv;
+        Servo _servo;
         int _min;
         int _center;
         int _max;        
-        int _postion;
+        int _position;
 };
 
 #endif

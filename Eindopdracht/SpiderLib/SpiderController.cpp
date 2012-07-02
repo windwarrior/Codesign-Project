@@ -13,12 +13,12 @@ SpiderController::SpiderController(int leftpin, int middlepin, int rightpin){
 //Public
 void SpiderController::turnLeft()
 {
-    turn(TURN__left);
+    turn(TURN_LEFT);
 }
 
 void SpiderController::turnRight()
 {
-    turn(TURN__right);
+    turn(TURN_RIGHT);
 }
 
 void SpiderController::forward()
@@ -45,9 +45,9 @@ void SpiderController::back()
 
 void SpiderController::reset()
 {
-   _left.write(leftMin + (range/2));
-   _middle.write(midMin + ((midMax-midMin)/2));
-   _right.write(rightMin + (range/2));
+   _left.reset();
+   _middle.reset();
+   _right.reset();
    delay(3000);
 }
 
@@ -92,14 +92,14 @@ void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int range2)
 
 void SpiderController::sweepFromTo(Motor mot, int to)
 {
-  if(from > to){
-    for(int i = from; i > to; i--){
+  if(mot.getPosition() > to){
+    for(int i = mot.getPosition(); i > to; i--){
       mot.write(i);
       delay(2);
     }
     mot.write(to); //TODO waarom dit eigenlijk?
   }else{
-    for(int i = from; i < to; i++){
+    for(int i = mot.getPosition(); i < to; i++){
       mot.write(i);
       delay(2);
     }
@@ -108,14 +108,12 @@ void SpiderController::sweepFromTo(Motor mot, int to)
   
 }
 
-void SpiderController::turn(int side){
+void SpiderController::turn(Turn side){
   //First tilt the robot to a side
-  if(side == TURNLEFT){
+  if(side == TURN_LEFT){
     sweepFromTo(_middle,  _middle.getMin());
-    posMiddle = midMin;
-  } else if(side == TURNRIGHT){
+  } else if(side == TURN_RIGHT){
     sweepFromTo(_middle,  _middle.getMax());
-    posMiddle = midMax;
   }
 
   //Then move its legs
@@ -126,18 +124,16 @@ void SpiderController::turn(int side){
   delay(500);
   
   //Tilt it to its other side
-  if(side == TURNLEFT){
+  if(side == TURN_LEFT){
     sweepFromTo(_middle,  _middle.getMax());
-    posMiddle = midMax;
-  } else if(side == TURNRIGHT){
+  } else if(side == TURN_RIGHT){
     sweepFromTo(_middle,  _middle.getMin());
-    posMiddle = midMin;
   }
 
   //And move its legs to the other side
   delay(500);
   rangeLeft = _left.getMax() - _left.getPosition();
   rangeRight = _right.getMin() - _right.getPosition();
-  sweepTwo(_left, rangeLeft, _right, posRight, rangeRight);
+  sweepTwo(_left, rangeLeft, _right, rangeRight);
   delay(500);
 }
