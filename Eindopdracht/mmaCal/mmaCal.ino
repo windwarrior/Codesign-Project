@@ -8,7 +8,7 @@
 #include <nRF24L01.h>
 #include <RF24_config.h>
 
-//#define debug
+#define debug
 MMA845 mma;
 RF24 radio(3,9);
 
@@ -24,7 +24,7 @@ int iterations = 20;
 
 
 void setup(){
-  pinMode(13, OUTPUT);
+  pinMode(5, OUTPUT);
   mma.begin();
   Serial.begin(115200);
   delay(2000);
@@ -37,12 +37,12 @@ void setupRadio(){
   delay(20);
   radio.setChannel(channel);
   radio.setRetries(15,15);
-  radio.setPayloadSize(8);
+  radio.setPayloadSize(32);
 
   radio.openWritingPipe(pipes[0]);
   
   //TODO: afvragen  of dit strict noodzakelijk is
-  radio.openReadingPipe(pipes[1], 1);
+  radio.openReadingPipe(1, pipes[1]);
 
   radio.startListening();
 
@@ -58,7 +58,7 @@ void calibrate(){
   
   int xMax = 0, yMax = 0, zMax = 0;
   
-  digitalWrite(13, HIGH);
+  digitalWrite(5, HIGH);
   for(int i = 0; i<iterations; i++){
     int x = 0 , y =  0, z = 0;
     mma.getAccXYZ(&x,&y,&z);
@@ -102,7 +102,7 @@ void calibrate(){
 
 
   }
-  digitalWrite(13, LOW);
+  digitalWrite(5, LOW);
 
   xCenter = map(xTot / iterations, 0, 1023, -512, 512);
   yCenter = map(yTot / iterations, 0, 1023, -512, 512);
@@ -128,7 +128,7 @@ void calibrate(){
 }
 
 void loop(){
-
+  Serial.println("Looping!");
   int x, y, z = 0;
   mma.getAccXYZ(&x,&y,&z);
   #ifdef debug
@@ -188,12 +188,16 @@ void generateMessage(char message[], int direction, int amount){
 
 void sendDirection(int dir, int val){
   char message[32];
+  message[31] = 0x00;
   generateMessage(message, dir, val);
-
+  Serial.println(message);
   bool isSend = false;
   int i = 0;
   while(!isSend && i < retries){
     bool isSend = radio.write(message, 32);
+    if(isSend){
+      Serial.println(i);  
+    }  
     i++;
   }
 }

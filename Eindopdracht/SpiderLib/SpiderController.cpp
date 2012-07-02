@@ -1,14 +1,14 @@
 #include "Arduino.h"
 #include "SpiderController.h"
 
-SpiderController::SpiderController(int leftpin, int middlepin, int rightpin){
+SpiderController::SpiderController(int leftpin, int middlepin, int rightpin){   
     _left.attach(leftpin);
-    _right.attach(rightpin);
-    _middle.attach(middlepin);
+    //_right.attach(rightpin);
+    //_middle.attach(middlepin);
     _left.calibrate(102, 17);
-    _middle.calibrate(95, 17);
-    _right.calibrate(78, 17);    
-
+    //_middle.calibrate(95, 17);
+    //_right.calibrate(78, 17);    
+    Serial.begin(9600);
     reset(); 
 }
 
@@ -48,9 +48,14 @@ void SpiderController::back()
 void SpiderController::reset()
 {
    _left.reset();
-   _middle.reset();
-   _right.reset();
-   delay(3000);
+   //_middle.reset();
+   //_right.reset();
+    Serial.print("hallo");
+    Serial.print(_left.getMin());
+    Serial.print(" ");
+    Serial.print(_left.getCenter());
+    Serial.print(" ");
+    Serial.println(_left.getMax());
 }
 
 
@@ -138,4 +143,16 @@ void SpiderController::turn(Turn side){
   rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
   delay(500);
+}
+
+void SpiderController::setBla(int blab){
+
+    _blab = blab;
+
+}
+
+int SpiderController::getBla(){
+
+    return _blab;
+
 }
