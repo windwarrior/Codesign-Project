@@ -1,7 +1,7 @@
 #ifndef _SPIDER_H_
 #define _SPIDER_H_
 #include "Arduino.h"
-#include <Motor.h>
+#include "Motor.h"
 
 enum Turn{
     TURN_LEFT,

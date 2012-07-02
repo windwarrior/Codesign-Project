@@ -32,9 +32,9 @@ int posRight = rightMin + (range/2);
 
 void setup()
 {
-  left.attach(9);
-  middle.attach(10);
-  right.attach(11);
+  left.attach(3);
+  middle.attach(5);
+  right.attach(6);
   reset();
   delay(3000);
 }
