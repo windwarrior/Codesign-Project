@@ -1,43 +1,40 @@
 #include "Arduino.h"
 #include "SpiderController.h"
-#include "Servo.h"
 
 SpiderController::SpiderController(int leftpin, int middlepin, int rightpin){
-    left.attach(leftpin);
-    right.attach(rightpin);
-    middle.attach(middlepin);
-
-    calibrate(LEFT_MOTOR, 102, 17);
-    calibrate(RIGHT_MOTOR, 78, 17);
-    calibrate(CENTER_MOTOR, 95, 17);    
+    _left.attach(leftpin);
+    _right.attach(rightpin);
+    _middle.attach(middlepin);
+    _left.calibrate(102, 17);
+    _middle.calibrate(95, 17);
+    _right.calibrate(78, 17);     
 }
 
 //Public
 void SpiderController::turnLeft()
 {
-    turn(TURN_LEFT);
+    turn(TURN__left);
 }
 
 void SpiderController::turnRight()
 {
-    turn(TURN_RIGHT);
+    turn(TURN__right);
 }
 
 void SpiderController::forward()
 {
-  sweepFromTo(middle, middlePos, middleMin);
-  middlePos = midMin;
+  sweepFromTo(_middle,  _middle.getMin());
   delay(100); 
-  rangeLeft = leftMax - leftPos;
-  rangeRight = rightMax - rightPos;
-  sweepTwo(LEFT_MOTOR, rangeLeft, RIGHT_MOTOR, rangeRight);
+  int rangeLeft = _left.getMax() - _left.getPosition();
+  int rangeRight = _right.getMax() - _right.getPosition();
+  sweepTwo(_left, rangeLeft, _right, rangeRight);
   delay(100);
   
-  sweepFromTo(MIDDLE_MOTOR, midMax);
+  sweepFromTo(_middle, _middle.getMax());
   delay(100);
-  rangeLeft = leftMin - leftPos;
-  rangeRight = rightMin - rightPos;
-  sweepTwo(LEFT_MOTOR, rangeLeft, RIGHT_MOTOR, rangeRight);
+  rangeLeft = _left.getMin() - _left.getPosition();
+  rangeRight = _right.getMin() - _right.getPosition();
+  sweepTwo(_left, rangeLeft, _right, rangeRight);
   delay(100);
 }
 
@@ -48,50 +45,30 @@ void SpiderController::back()
 
 void SpiderController::reset()
 {
-   left.write(leftMin + (range/2));
-   middle.write(midMin + ((midMax-midMin)/2));
-   right.write(rightMin + (range/2));
+   _left.write(leftMin + (range/2));
+   _middle.write(midMin + ((midMax-midMin)/2));
+   _right.write(rightMin + (range/2));
    delay(3000);
 }
 
-void SpiderController::calibrate(Motor mot, int center, int range){
-    if(mot == LEFT_MOTOR){
-        leftMin = center - range;
-        leftCenter = center;
-        leftMax = center + range;
-    }else if(mot == RIGHT_MOTOR){
-        rightMin = center - range;
-        rightCenter = center;
-        rightMax = center + range;
-    }else if(mot == MIDDLE_MOTOR{
-        middleMin = center - range;
-        middleCenter = center;
-        middleMax = center + range;
-
-    }
-}
 
 //Private
-void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int from2)
+void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int range2)
 {
-  Servo serv1 =  mot == LEFT_MOTOR ? left : mot == RIGHT_MOTOR ? right : middle;
-  Servo serv2 =  mot == LEFT_MOTOR ? left : mot == RIGHT_MOTOR ? right : middle;
-  int from1 =  mot == LEFT_MOTOR ? leftPos : mot == RIGHT_MOTOR ? rightPos : middlePos;
-  int from2 =  mot == LEFT_MOTOR ? leftPos : mot == RIGHT_MOTOR ? rightPos : middlePos;
-  int to1 = from1 + range1;
-  int to2 = from2 + range2;
-  int curr1 = from1;
-  int curr2 = from2;
+  int to1 = mot1.getPosition() + range1;
+  int to2 = mot2.getPosition() + range2;
+  int curr1 = mot1.getPosition();
+  int curr2 = mot2.getPosition();
   while(to1 != curr1 || to2 != curr2){
      //first servo
      if(range1 < 0){
         if(curr1 > to1 && curr1 >= 0 && curr1 <= 180){
-           serv1.write(curr1);
+           mot1.write(curr1);
            curr1--;
         }
      } else {
          if(curr1 < to1 && curr1 >= 0 && curr1 <= 180){
-           serv1.write(curr1);
+           mot1.write(curr1);
            curr1++;
          }
      } 
@@ -99,12 +76,12 @@ void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int from2)
      //second servo
      if(range2 < 0){
         if(curr2 > to2 && curr2 >= 0 && curr2 <= 180){
-           serv2.write(curr2);
+           mot2.write(curr2);
            curr2--;
         }
      } else {
          if(curr2 < to2 && curr2 >= 0 && curr2 <= 180){
-           serv2.write(curr2);
+           mot2.write(curr2);
            curr2++;
          }
      }   
@@ -115,52 +92,52 @@ void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int from2)
 
 void SpiderController::sweepFromTo(Motor mot, int to)
 {
-  Servo serv =  mot == LEFT_MOTOR ? left : mot == RIGHT_MOTOR ? right : middle;
-  int from =  mot == LEFT_MOTOR ? leftPos : mot == RIGHT_MOTOR ? rightPos : middlePos;
   if(from > to){
     for(int i = from; i > to; i--){
-      serv.write(i);
+      mot.write(i);
       delay(2);
     }
-    serv.write(to);
+    mot.write(to); //TODO waarom dit eigenlijk?
   }else{
     for(int i = from; i < to; i++){
-      serv.write(i);
+      mot.write(i);
       delay(2);
     }
-    serv.write(to);
+    mot.write(to); //TODO waarom dit eigenlijk?
   }
   
 }
 
 void SpiderController::turn(int side){
-  if(side == TURN_LEFT){
-    sweepFromTo(middle, posMiddle, midMin);
+  //First tilt the robot to a side
+  if(side == TURNLEFT){
+    sweepFromTo(_middle,  _middle.getMin());
     posMiddle = midMin;
-  } else if(side == TURN_RIGHT){
-    sweepFromTo(middle, posMiddle, midMax);
+  } else if(side == TURNRIGHT){
+    sweepFromTo(_middle,  _middle.getMax());
     posMiddle = midMax;
   }
+
+  //Then move its legs
   delay(500);
-  rangeLeft = leftMin - posLeft;
-  rangeRight = rightMax - posRight;
-  sweepTwo(left, posLeft, rangeLeft, right, posRight, rangeRight);
-  posLeft = posLeft + rangeLeft;
-  posRight = posRight + rangeRight;
+  int rangeLeft = _left.getMin() - _left.getPosition();
+  int rangeRight = _right.getMax() - _right.getPosition();
+  sweepTwo(_left, rangeLeft, _right, rangeRight);
   delay(500);
   
-  if(side == TURN_LEFT){
-    sweepFromTo(middle, posMiddle, midMax);
+  //Tilt it to its other side
+  if(side == TURNLEFT){
+    sweepFromTo(_middle,  _middle.getMax());
     posMiddle = midMax;
-  } else if(side == TURN_RIGHT){
-    sweepFromTo(middle, posMiddle, midMin);
+  } else if(side == TURNRIGHT){
+    sweepFromTo(_middle,  _middle.getMin());
     posMiddle = midMin;
   }
+
+  //And move its legs to the other side
   delay(500);
-  rangeLeft = leftMax - posLeft;
-  rangeRight = rightMin - posRight;
-  sweepTwo(left, posLeft, rangeLeft, right, posRight, rangeRight);
-  posLeft = posLeft + rangeLeft;
-  posRight = posRight + rangeRight;
+  rangeLeft = _left.getMax() - _left.getPosition();
+  rangeRight = _right.getMin() - _right.getPosition();
+  sweepTwo(_left, rangeLeft, _right, posRight, rangeRight);
   delay(500);
 }

@@ -1,12 +1,7 @@
-#ifndef Morse_h
-#define Morse_h
+#ifndef SpiderController
+#define SpiderController
 #include "Arduino.h"
-#include "Servo.h"
-enum Motor{
-    LEFT_MOTOR,
-    RIGHT_MOTOR,
-    CENTER_MOTOR
-};
+#include <Motor.h>
 
 enum Turn{
     TURN_LEFT,
@@ -21,28 +16,13 @@ class SpiderController{
         void forward();
         void back();
         void reset();
-        void calibrate(Motor motor, int center, int range);
+        void calibrate(Motor mot, int center, int range);     
     private:
-        void sweepTwo(Servo serv1, int from1, int range1, Servo serv2, int from2, int range2);
-        void sweepFromTo(Servo serv, int from, int to);
+        void sweepTwo(Motor mot1, int range1, Motor mot2, int range2);
+        void sweepFromTo(Motor mot, int from, int to);
         void turn(int side);
-
-        Servo left;
-        int leftMin;
-        int leftCenter;
-        int leftMax;
-        int leftPos;
-
-        Servo middle;
-        int middleMin;
-        int middleCenter;
-        int middleMax;
-        int middlePos;
-
-        Servo right;
-        int rightMin;
-        int rightCenter;
-        int rightMax;
-        int rightPos;
+        Motor _left;
+        Motor _center;
+        Motor _right;   
 };
 #endif
