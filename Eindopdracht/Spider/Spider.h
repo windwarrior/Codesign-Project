@@ -6,5 +6,3 @@ enum Direction {
   NONE
 };
 
-Direction getDirection();
-

@@ -4,7 +4,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <RF24_config.h>
-//#include "Spider.h"
+#include "Spider.h"
 
 //RADIO
 RF24 radio(9,10);
@@ -42,7 +42,7 @@ int posLeft = leftMin + (range/2);
 int posMiddle = midMin + ((midMax-midMin)/2);
 int posRight = rightMin + (range/2);
 
-int currentDirection = 0;
+int currentDirection = NONE;
 
 void setup(){
   printf_begin();
@@ -58,32 +58,9 @@ void setup(){
 
 void loop(){
   //handle remote control
-  boolean ready = false;
-  boolean timeout = false;
-  int time = millis();
-  
-  while(!ready && !timeout){
-    if(radio.available()){
-      ready = true;
-    }
-    //if(millis() - time > 10){
-       timeout = true; 
-    //}
-  }
-  if(ready){ 
-    char msg[32];
-    boolean isRead = radio.read(&msg, 32);
-  
-    Serial.println("---------------------------");
-    Serial.print("Message received: ");
-    Serial.println(msg);  
-  }
-  if(timeout && !ready){
-     Serial.println("timeout"); 
-  }
+  receiveDirection();
   //handle compass
   //handle radio
-  delay(500);
 }
 
 //RADIO FUNCTIONS
@@ -105,7 +82,32 @@ void setupRadio(){
 }
 
 void receiveDirection(){
+  boolean ready = false;
+  boolean timeout = false;
+  int time = millis();
   
+  while(!ready && !timeout){//kan if worden =P
+    if(radio.available()){
+      ready = true;
+    }
+    timeout = true;
+  }
+  if(ready){ 
+    char msg[32];
+    boolean isRead = radio.read(&msg, 32);
+    
+    currentDirection = getDirection(msg[0]);//zoiets?
+  
+    Serial.println("---------------------------");
+    Serial.print("Message received: ");
+    Serial.println(msg[0]);  
+  }
+  if(timeout && !ready){
+     Serial.println("Going to other stuff..."); 
+  }
+  Serial.println("Nothing happened");
+  
+  moveSpider();
 }
 
 void sendHeading(){
@@ -113,6 +115,24 @@ void sendHeading(){
 }
 
 //SPIDERWALK FUNCTIONS
+void moveSpider(){
+   if(currentDirection == FORWARD){
+     forward();
+     Serial.println("voor");
+   } else if(currentDirection == LEFT){
+      turnLeft();
+       Serial.println("links");
+   } else if(currentDirection == RIGHT){
+      turnRight();
+       Serial.println("rechts");
+   } else if(currentDirection == BACK){
+     //wololo achteruit
+      Serial.println("achter");
+   } else if(currentDirection == NONE) {
+       Serial.println("niks"); 
+   }
+}
+
 void forward()
 {
   sweepFromTo(middle, posMiddle, midMin);
@@ -235,4 +255,19 @@ void reset()
    middle.write(midMin + ((midMax-midMin)/2));
    right.write(rightMin + (range/2));
    delay(3000);
+}
+
+//DIRECTION
+Direction getDirection(int val){
+  if(val == 0){
+    return FORWARD;
+  } else if(val == 1){
+    return RIGHT;
+  } else if(val == 2){
+    return BACK;
+  } else if(val == 3){
+    return LEFT;
+  } else {
+    return NONE;
+  }
 }
