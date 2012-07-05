@@ -3,7 +3,6 @@
 #include "Motor.h"
 
 Motor::Motor(){
-
 }
 
 void Motor::calibrate(int center, int range){

@@ -10,22 +10,21 @@ enum Turn{
 
 class SpiderController{
     public:
-        SpiderController(int leftpin, int middlepin, int rightpin);
+        SpiderController();
         void turnLeft();
         void turnRight();
         void forward();
         void back();
+	void begin(int leftpin, int middlepin, int rightpin);
         void reset();
         void calibrate(Motor mot, int center, int range);    
-        void setBla(int blab);
-        int getBla(); 
+        void test();
     private:
         void sweepTwo(Motor mot1, int range1, Motor mot2, int range2);
         void sweepFromTo(Motor mot, int to);
         void turn(Turn side);
         Motor _left;
         Motor _middle;
-        Motor _right; 
-        int _blab;  
+        Motor _right;  
 };
 #endif

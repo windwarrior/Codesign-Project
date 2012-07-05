@@ -2,39 +2,28 @@
 #include <SpiderController.h>
 #include <Servo.h>
 
-SpiderController control(3,5,6);
+SpiderController control;
 
 void setup(){
+  Serial.begin(9600);
+  control.begin(3,5,6);
 }
 
 void loop(){
-  /*
-  for(int i = mot1.getMin(); i < mot1.getMax(); i++){
-    mot1.write(i);
-    Serial.print(i);
-    Serial.print(" ");
-    Serial.println(mot1.getPosition());
-    delay(5);
+
+  for(int i=0; i<4; i++){
+    control.forward();
+    Serial.println("testing forward");
+  }
+  control.turnLeft();
+  Serial.println("testing turnLeft");
+    
+  for(int i=0; i<4; i++){
+    control.forward();
+    Serial.println("testing forward");
   }
   
-  for(int i = mot1.getMax(); i > mot1.getMin(); i--){
-    mot1.write(i);
-    Serial.print(i);
-    Serial.print(" ");
-    Serial.println(mot1.getPosition());
-    delay(5);
-  }
-  
-  
-  delay(3000);
-  
-  mot1.reset();
-  
-  delay(3000);
-  
-  */
-  
-  control.reset();
-  
-  delay(200);
+  control.turnRight();
+  Serial.println("testing turnRight");
+
 }

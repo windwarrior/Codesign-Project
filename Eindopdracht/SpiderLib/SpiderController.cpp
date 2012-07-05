@@ -1,15 +1,15 @@
 #include "Arduino.h"
 #include "SpiderController.h"
-
-SpiderController::SpiderController(int leftpin, int middlepin, int rightpin){   
+SpiderController::SpiderController(){
+}
+void SpiderController::begin(int leftpin, int middlepin, int rightpin){   
     _left.attach(leftpin);
-    //_right.attach(rightpin);
-    //_middle.attach(middlepin);
+    _right.attach(rightpin);
+    _middle.attach(middlepin);
     _left.calibrate(102, 17);
-    //_middle.calibrate(95, 17);
-    //_right.calibrate(78, 17);    
-    Serial.begin(9600);
-    reset(); 
+    _middle.calibrate(95, 17);
+    _right.calibrate(78, 17);    
+     reset(); 
 }
 
 //Public
@@ -48,14 +48,8 @@ void SpiderController::back()
 void SpiderController::reset()
 {
    _left.reset();
-   //_middle.reset();
-   //_right.reset();
-    Serial.print("hallo");
-    Serial.print(_left.getMin());
-    Serial.print(" ");
-    Serial.print(_left.getCenter());
-    Serial.print(" ");
-    Serial.println(_left.getMax());
+   _middle.reset();
+   _right.reset();
 }
 
 
@@ -145,14 +139,21 @@ void SpiderController::turn(Turn side){
   delay(500);
 }
 
-void SpiderController::setBla(int blab){
-
-    _blab = blab;
-
+void SpiderController::test(){
+  //test left motor
+  _left.write(150);
+  delay(1000);
+  _left.write(30);
+  delay(1000);
+  //test middle motor
+    _middle.write(150);
+  delay(1000);
+  _middle.write(30);
+  delay(1000);
+  //test right motor
+    _right.write(150);
+  delay(1000);
+  _right.write(30);
+  delay(1000);
 }
 
-int SpiderController::getBla(){
-
-    return _blab;
-
-}
