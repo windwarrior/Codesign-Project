@@ -22,14 +22,17 @@ int xGain = 0, yGain = 0, zGain = 0;
 
 int iterations = 20;
 
+Direction current = NONE;
+
 
 void setup(){
   pinMode(5, OUTPUT);
   mma.begin();
-  Serial.begin(115200);
+  Serial.begin(57600);
   delay(2000);
   calibrate();
   setupRadio();
+  Serial.println("End of setup!");
 }
 
 void setupRadio(){
@@ -72,15 +75,15 @@ void calibrate(){
     Serial.print("xTot: ");
     Serial.print(xTot);
     Serial.print(" x: ");
-    Serial.print(x);
+    Serial.println(x);
     Serial.print("yTot: ");
     Serial.print(yTot);
     Serial.print(" y: ");
-    Serial.print(y);
+    Serial.println(y);
     Serial.print("zTot: ");
     Serial.print(zTot);
     Serial.print(" z: ");
-    Serial.print(z);
+    Serial.println(z);
     #endif
     delay(100);
 
@@ -128,7 +131,7 @@ void calibrate(){
 }
 
 void loop(){
-  Serial.println("Looping!");
+  //Serial.println("Looping!");
   int x, y, z = 0;
   mma.getAccXYZ(&x,&y,&z);
   #ifdef debug
@@ -147,17 +150,18 @@ void loop(){
   Serial.print(" dir: " );
   #endif
   Direction dir = getDirection(x - xCenter, y - yCenter);
-  if(dir == FORWARD){
-    Serial.println("Forward" );
-  }else if(dir == BACK){
+  if(dir == FORWARD && current != FORWARD){
+    Serial.println("FORWARD");
+  }else if(dir == BACK && current != BACK){
     Serial.println("Back" );
-  }else if(dir == LEFT){
+  }else if(dir == LEFT && current != LEFT){
     Serial.println("Left" );
-  }else if(dir == RIGHT){
+  }else if(dir == RIGHT && current != RIGHT){
     Serial.println("Right" );
-  }else{
+  }else if (dir == NONE && current != NONE){
     Serial.println("None");
   }
+  current = dir;
 
   sendDirection(dir, 0);
 
@@ -165,13 +169,13 @@ void loop(){
 }
 
 Direction getDirection(int x, int y){
-  if(x > 200){
+  if(x > xCenter + 50){
     return FORWARD;
-  }else if(x < -200){
+  }else if(x < xCenter - 50){
     return BACK;
-  }else if(y > 200){
+  }else if(y > xCenter + 50){
     return RIGHT;
-  }else if(y < -200){
+  }else if(y < yCenter - 50){
     return LEFT;
   }else{
     return NONE;
@@ -190,13 +194,13 @@ void sendDirection(int dir, int val){
   char message[32];
   message[31] = 0x00;
   generateMessage(message, dir, val);
-  Serial.println(message);
+  //Serial.println(message);
   bool isSend = false;
   int i = 0;
   while(!isSend && i < retries){
-    bool isSend = radio.write(message, 32);
+    bool isSend = true;//radio.write(message, 32);
     if(isSend){
-      Serial.println(i);  
+      //Serial.println(i);  
     }  
     i++;
   }
