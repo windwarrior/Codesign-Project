@@ -38,6 +38,7 @@ void SpiderController::forward()
   rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
   delay(100);
+
 }
 
 void SpiderController::back()
