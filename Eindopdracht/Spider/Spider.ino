@@ -108,6 +108,7 @@ void receiveDirection(){
   Serial.println("Nothing happened");
   
   moveSpider();
+  delay(500);
 }
 
 void sendHeading(){
@@ -258,14 +259,14 @@ void reset()
 }
 
 //DIRECTION
-Direction getDirection(int val){
-  if(val == 0){
+Direction getDirection(char val){
+  if(val == '0'){
     return FORWARD;
-  } else if(val == 1){
+  } else if(val == '1'){
     return RIGHT;
-  } else if(val == 2){
+  } else if(val == '2'){
     return BACK;
-  } else if(val == 3){
+  } else if(val == '3'){
     return LEFT;
   } else {
     return NONE;
