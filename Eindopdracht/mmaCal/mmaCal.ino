@@ -12,7 +12,8 @@
 MMA845 mma;
 RF24 radio(3,9);
 
-const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
+const uint64_t pipes[2] = { 
+  0xd250dbcf39LL, 0x4aac2e23feLL };
 
 const int channel = 67;
 const int retries = 5;
@@ -43,7 +44,7 @@ void setupRadio(){
   radio.setPayloadSize(32);
 
   radio.openWritingPipe(pipes[0]);
-  
+
   //TODO: afvragen  of dit strict noodzakelijk is
   radio.openReadingPipe(1, pipes[1]);
 
@@ -58,9 +59,9 @@ void calibrate(){
   int xTot = 0, yTot = 0, zTot = 0;
 
   int xMin = 5000, yMin = 5000,  zMin = 5000;
-  
+
   int xMax = 0, yMax = 0, zMax = 0;
-  
+
   digitalWrite(5, HIGH);
   for(int i = 0; i<iterations; i++){
     int x = 0 , y =  0, z = 0;
@@ -71,7 +72,7 @@ void calibrate(){
     xTot = xTot + x;
     yTot = yTot + y;
     zTot = zTot + z;
-    #ifdef debug
+#ifdef debug
     Serial.print("xTot: ");
     Serial.print(xTot);
     Serial.print(" x: ");
@@ -84,13 +85,13 @@ void calibrate(){
     Serial.print(zTot);
     Serial.print(" z: ");
     Serial.println(z);
-    #endif
+#endif
     delay(100);
 
     xMin = min(x, xMin);
     yMin = min(y, yMin);
     zMin = min(z, zMin);
-    #ifdef debug
+#ifdef debug
     Serial.print(" xMin: ");
     Serial.print(xMin);
     Serial.print(" yMin: ");
@@ -98,7 +99,7 @@ void calibrate(){
     Serial.print(" zMin: ");
     Serial.println(zMin);    
     Serial.println("--------------------------");
-    #endif
+#endif
     xMax = max(x, xMax);
     yMax = max(y, yMax);
     zMax = max(z, zMax);
@@ -132,52 +133,65 @@ void calibrate(){
 
 void loop(){
   //Serial.println("Looping!");
-  int x, y, z = 0;
-  mma.getAccXYZ(&x,&y,&z);
-  #ifdef debug
-  Serial.print("x: ");
-  Serial.print(x);
-  Serial.print(" xCorr: ");
-  Serial.print(x - xCenter);
-  Serial.print(" y: ");
-  Serial.print(y);
-  Serial.print(" yCorr: ");
-  Serial.print(y - yCenter);
-  Serial.print(" ");
-  Serial.print(z);
-  Serial.print(" zCorr: ");
-  Serial.print(z - zCenter);
-  Serial.print(" dir: " );
-  #endif
-  Direction dir = getDirection(x - xCenter, y - yCenter);
-  if(dir == FORWARD && current != FORWARD){
-    Serial.println("FORWARD");
-  }else if(dir == BACK && current != BACK){
-    Serial.println("Back" );
-  }else if(dir == LEFT && current != LEFT){
-    Serial.println("Left" );
-  }else if(dir == RIGHT && current != RIGHT){
-    Serial.println("Right" );
-  }else if (dir == NONE && current != NONE){
-    Serial.println("None");
+  radio.startListening();
+  boolean ready = false;
+  while(!ready){
+    if(radio.available()){
+      ready = true;
+    }else{
+      
+    }
   }
-  current = dir;
 
-  sendDirection(dir, 0);
+  char msg[32];
 
+  boolean isRead = radio.read(&msg, 32);
+  
+  if(isRead){
+    Serial.println(msg);
+    int x, y, z = 0;
+    mma.getAccXYZ(&x,&y,&z);
+
+    Direction dir = getDirection(x - xCenter, y - yCenter);
+    if(dir == FORWARD && current != FORWARD){
+      Serial.println("FORWARD");
+    }
+    else if(dir == BACK && current != BACK){
+      Serial.println("Back" );
+    }
+    else if(dir == LEFT && current != LEFT){
+      Serial.println("Left" );
+    }
+    else if(dir == RIGHT && current != RIGHT){
+      Serial.println("Right" );
+    }
+    else if (dir == NONE && current != NONE){
+      Serial.println("None");
+    }
+    current = dir;
+    radio.stopListening();
+    sendDirection(dir, 0);
+  }else{
+    Serial.println("No can't do!");
+  }
+  
   delay(20);
 }
 
 Direction getDirection(int x, int y){
   if(x > xCenter + 50){
     return FORWARD;
-  }else if(x < xCenter - 50){
+  }
+  else if(x < xCenter - 50){
     return BACK;
-  }else if(y > xCenter + 50){
+  }
+  else if(y > xCenter + 50){
     return RIGHT;
-  }else if(y < yCenter - 50){
+  }
+  else if(y < yCenter - 50){
     return LEFT;
-  }else{
+  }
+  else{
     return NONE;
   }
 }
@@ -198,13 +212,15 @@ void sendDirection(int dir, int val){
   bool isSend = false;
   int i = 0;
   while(!isSend && i < retries){
-    bool isSend = true;//radio.write(message, 32);
+    bool isSend = radio.write(message, 32);
     if(isSend){
+      Serial.println("Sending!");
       //Serial.println(i);  
     }  
     i++;
   }
 }
+
 
 
 
