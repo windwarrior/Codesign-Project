@@ -29,6 +29,7 @@ Direction current = NONE;
 void setup(){
   pinMode(5, OUTPUT);
   mma.begin();
+  printf_begin();
   Serial.begin(57600);
   delay(2000);
   calibrate();
@@ -148,7 +149,6 @@ void loop(){
   boolean isRead = radio.read(&msg, 32);
   
   if(isRead){
-    Serial.println(msg);
     int x, y, z = 0;
     mma.getAccXYZ(&x,&y,&z);
 
@@ -214,7 +214,6 @@ void sendDirection(int dir, int val){
   while(!isSend && i < retries){
     bool isSend = radio.write(message, 32);
     if(isSend){
-      Serial.println("Sending!");
       //Serial.println(i);  
     }  
     i++;

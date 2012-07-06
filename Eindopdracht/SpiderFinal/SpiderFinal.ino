@@ -37,6 +37,7 @@ int currentDirection = NONE;
 void setup(){
   printf_begin();
   pinMode(13, OUTPUT);
+  pinMode(4, OUTPUT);
   Serial.begin(57600);
   control.begin(3,5,6);
   setupRadio();
@@ -94,10 +95,13 @@ void receiveDirection(){
   
   //READ DIRECTION
   while(!ready){//kan if worden =P
+    digitalWrite(4, HIGH);
     if(radio.available()){
       ready = true;
     }
   }
+  digitalWrite(4, LOW);
+  
   if(ready){ 
     char msg[32];
     boolean isRead = radio.read(&msg, 32);
