@@ -93,7 +93,7 @@ void receiveDirection(){
   radio.startListening();
   
   //READ DIRECTION
-  int time = millis() + 20;//200ms timeout
+  int time = millis() + 100;//200ms timeout
   while(!ready && !timeout){//kan if worden =P
     if(radio.available()){
       ready = true;
