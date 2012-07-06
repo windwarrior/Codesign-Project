@@ -46,6 +46,7 @@ void setup(){
 void loop(){
   //handle remote control
   receiveDirection();
+  //control.forward();
   //handle compass
   //handle radio
 }
@@ -73,11 +74,29 @@ void receiveDirection(){
   boolean timeout = false;
   int time = millis();
   
-  while(!ready && !timeout){//kan if worden =P
+  radio.stopListening();
+  
+  //REQUEST DIRECTION
+  char message[32];
+  message[31] = 0x00;
+  message[1] = '1';
+  bool isSend = false;
+  int i = 0;
+  while(!isSend && i < retries){
+    bool isSend = radio.write(message, 32);
+    if(isSend){
+      //Serial.println(i);  
+    }  
+    i++;
+  }
+  
+  radio.startListening();
+  
+  //READ DIRECTION
+  while(!ready){//kan if worden =P
     if(radio.available()){
       ready = true;
     }
-    timeout = true;
   }
   if(ready){ 
     char msg[32];
@@ -95,7 +114,7 @@ void receiveDirection(){
   Serial.println("Nothing happened");
   
   moveSpider();
-  delay(500);
+  delay(20);//TODO: KORTER MAKEN!
 }
 
 void sendHeading(){
