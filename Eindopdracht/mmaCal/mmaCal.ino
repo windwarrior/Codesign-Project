@@ -136,6 +136,7 @@ void loop(){
   //Serial.println("Looping!");
   radio.startListening();
   boolean ready = false;
+  Serial.println("Starting busy wait");
   while(!ready){
     if(radio.available()){
       ready = true;
@@ -143,6 +144,7 @@ void loop(){
       
     }
   }
+  Serial.println("Request received");
 
   char msg[32];
 

@@ -36,7 +36,6 @@ int currentDirection = NONE;
 
 void setup(){
   printf_begin();
-  pinMode(13, OUTPUT);
   pinMode(4, OUTPUT);
   Serial.begin(57600);
   control.begin(3,5,6);
@@ -73,7 +72,6 @@ void setupRadio(){
 void receiveDirection(){
   boolean ready = false;
   boolean timeout = false;
-  int time = millis();
   
   radio.stopListening();
   
@@ -86,25 +84,31 @@ void receiveDirection(){
   while(!isSend && i < retries){
     bool isSend = radio.write(message, 32);
     if(isSend){
-      //Serial.println(i);  
+      Serial.println("Request sent");  
     }  
+    //Serial.println("faal");
     i++;
   }
   
   radio.startListening();
   
   //READ DIRECTION
-  while(!ready){//kan if worden =P
-    digitalWrite(4, HIGH);
+  int time = millis() + 100;//200ms timeout
+  digitalWrite(4, HIGH);
+  while(!ready && !timeout){//kan if worden =P
     if(radio.available()){
       ready = true;
+    }
+    if(millis() > time){
+      timeout = true;
     }
   }
   digitalWrite(4, LOW);
   
+  boolean isRead = false;
   if(ready){ 
     char msg[32];
-    boolean isRead = radio.read(&msg, 32);
+    isRead = radio.read(&msg, 32);
     
     currentDirection = getDirection(msg[0]);//zoiets?
   
@@ -112,12 +116,13 @@ void receiveDirection(){
     Serial.print("Message received: ");
     Serial.println(msg[0]);  
   }
-  if(timeout && !ready){
-     Serial.println("Going to other stuff..."); 
+  if(!ready && timeout){
+     Serial.println("Timeout..."); 
   }
-  Serial.println("Nothing happened");
   
-  moveSpider();
+  if(isRead){
+    moveSpider();
+  }
   delay(20);//TODO: KORTER MAKEN!
 }
 
