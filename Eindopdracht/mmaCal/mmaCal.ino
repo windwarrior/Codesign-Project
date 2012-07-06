@@ -161,6 +161,7 @@ void loop(){
   }else if (dir == NONE && current != NONE){
     Serial.println("None");
   }
+  Serial.println("------");
   current = dir;
 
   sendDirection(dir, 0);
@@ -198,7 +199,7 @@ void sendDirection(int dir, int val){
   bool isSend = false;
   int i = 0;
   while(!isSend && i < retries){
-    bool isSend = true;//radio.write(message, 32);
+    bool isSend = radio.write(message, 32);
     if(isSend){
       //Serial.println(i);  
     }  

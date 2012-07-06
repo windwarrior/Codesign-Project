@@ -46,6 +46,7 @@ void setup(){
 void loop(){
   //handle remote control
   receiveDirection();
+  //control.forward();
   //handle compass
   //handle radio
 }
@@ -95,7 +96,7 @@ void receiveDirection(){
   Serial.println("Nothing happened");
   
   moveSpider();
-  delay(500);
+  delay(20);//TODO: KORTER MAKEN!
 }
 
 void sendHeading(){

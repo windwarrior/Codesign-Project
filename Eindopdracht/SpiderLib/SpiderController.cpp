@@ -87,7 +87,7 @@ void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int range2)
            curr2++;
          }
      }   
-     delay(2);  
+     delay(4);  
   }
 }
 
@@ -97,13 +97,13 @@ void SpiderController::sweepFromTo(Motor mot, int to)
   if(mot.getPosition() > to){
     for(int i = mot.getPosition(); i > to; i--){
       mot.write(i);
-      delay(2);
+      delay(4);
     }
     mot.write(to); //TODO waarom dit eigenlijk?
   }else{
     for(int i = mot.getPosition(); i < to; i++){
       mot.write(i);
-      delay(2);
+      delay(4);
     }
     mot.write(to); //TODO waarom dit eigenlijk?
   }
