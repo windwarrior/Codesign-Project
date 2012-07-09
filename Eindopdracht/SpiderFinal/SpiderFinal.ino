@@ -119,7 +119,10 @@ void receiveHeading(){
   }
   
   if(isRead){
+    radio.stopListening();
     moveSpider();
+    radio.startListening();
+    delay(20);
   }
 }
 
