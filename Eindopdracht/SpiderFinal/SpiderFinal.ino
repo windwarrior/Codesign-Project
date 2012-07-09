@@ -45,8 +45,7 @@ void setup(){
 
 void loop(){
   //handle remote control
-  sendHandshake();
-  receiveHeading();
+  receiveDirection();
   //control.forward();
   //handle compass
   //handle radio
@@ -70,9 +69,13 @@ void setupRadio(){
   radio.printDetails();
 }
 
-void sendHandshake(){
+void receiveDirection(){
   boolean ready = false;
+  boolean timeout = false;
+  
   radio.stopListening();
+  
+  //REQUEST DIRECTION
   char message[32];
   message[31] = 0x00;
   message[1] = '1';
@@ -82,18 +85,17 @@ void sendHandshake(){
     bool isSend = radio.write(message, 32);
     if(isSend){
       Serial.println("Request sent");  
-    }
+    }  
+    //Serial.println("faal");
     i++;
-  }  
+  }
+  
   radio.startListening();
-  delay(20);//TODO: KORTER MAKEN!
-}
-
-void receiveHeading(){
+  
+  //READ DIRECTION
   int time = millis() + 100;//200ms timeout
-  boolean timeout = false;
   digitalWrite(4, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
-  while(!ready && !timeout){
+  while(!ready && !timeout){//kan if worden =P
     if(radio.available()){
       ready = true;
     }
@@ -108,7 +110,7 @@ void receiveHeading(){
     char msg[32];
     isRead = radio.read(&msg, 32);
     
-    currentDirection = getDirection(msg[0]);
+    currentDirection = getDirection(msg[0]);//zoiets?
   
     Serial.println("---------------------------");
     Serial.print("Message received: ");
@@ -119,8 +121,15 @@ void receiveHeading(){
   }
   
   if(isRead){
+    radio.stopListening();
     moveSpider();
+    radio.startListening();
   }
+  delay(20);//TODO: KORTER MAKEN!
+}
+
+void sendHeading(){
+  
 }
 
 //SPIDERWALK FUNCTIONS
