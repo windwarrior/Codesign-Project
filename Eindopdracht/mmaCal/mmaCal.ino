@@ -15,7 +15,7 @@ RF24 radio(3,9);
 const uint64_t pipes[2] = { 
   0xd250dbcf39LL, 0x4aac2e23feLL };
 
-const int channel = 67;
+const int channel = 88;
 const int retries = 5;
 int xCenter = 0, yCenter = 0, zCenter = 0;
 

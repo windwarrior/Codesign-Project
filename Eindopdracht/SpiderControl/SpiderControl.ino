@@ -11,14 +11,14 @@ void setup(){
 
 void loop(){
 
-  for(int i=0; i<4; i++){
+  for(int i=0; i<9; i++){
     control.forward();
     Serial.println("testing forward");
   }
   control.turnLeft();
   Serial.println("testing turnLeft");
     
-  for(int i=0; i<4; i++){
+  for(int i=0; i<9; i++){
     control.forward();
     Serial.println("testing forward");
   }

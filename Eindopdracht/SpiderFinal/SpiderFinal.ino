@@ -13,7 +13,7 @@
 //RADIO
 RF24 radio(9,10);
 const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
-const int channel = 67;
+const int channel = 88;
 const int retries = 5;
 boolean ready = false;
 
@@ -94,7 +94,7 @@ void receiveDirection(){
   
   //READ DIRECTION
   int time = millis() + 100;//200ms timeout
-  digitalWrite(4, HIGH);
+  digitalWrite(4, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
   while(!ready && !timeout){//kan if worden =P
     if(radio.available()){
       ready = true;
@@ -103,7 +103,7 @@ void receiveDirection(){
       timeout = true;
     }
   }
-  digitalWrite(4, LOW);
+  digitalWrite(4, LOW); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
   
   boolean isRead = false;
   if(ready){ 
