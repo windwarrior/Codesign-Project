@@ -4,11 +4,11 @@
 #define leftMax 120
 #define leftMin 85
 
-#define midMax 125
-#define midMin 65
+#define midMax 115
+#define midMin 55
 
-#define rightMax 95
-#define rightMin 60
+#define rightMax 85
+#define rightMin 50
 
 #define TURNLEFT 0
 #define TURNRIGHT 1
@@ -35,15 +35,20 @@ void setup()
   left.attach(3);
   middle.attach(5);
   right.attach(6);
-  reset();
+ //reset();
   delay(3000);
 }
 
 void loop()
 {
- forward();
- //turnLeft();
- //left.write(120);
+ //forward();
+// left.write(leftMax);
+// right.write(rightMax);
+// middle.write(midMax);
+ 
+ left.write(leftMin);
+ right.write(rightMin);
+ middle.write(midMin);
 }
 
 void forward()

@@ -7,8 +7,8 @@ void SpiderController::begin(int leftpin, int middlepin, int rightpin){
     _right.attach(rightpin);
     _middle.attach(middlepin);
     _left.calibrate(102, 17);
-    _middle.calibrate(90, 17);
-    _right.calibrate(78, 17);    
+    _middle.calibrate(85, 30);
+    _right.calibrate(67, 17);    
      reset(); 
 }
 
