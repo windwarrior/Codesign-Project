@@ -45,8 +45,9 @@ void setup(){
 
 void loop(){
   //handle remote control
-  sendHandshake();
-  receiveHeading();
+  //sendHandshake();
+  //receiveHeading();
+  control.forward();
   //control.forward();
   //handle compass
   //handle radio

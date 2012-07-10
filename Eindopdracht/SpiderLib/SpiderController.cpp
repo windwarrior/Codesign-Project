@@ -7,7 +7,7 @@ void SpiderController::begin(int leftpin, int middlepin, int rightpin){
     _right.attach(rightpin);
     _middle.attach(middlepin);
     _left.calibrate(102, 17);
-    _middle.calibrate(85, 30);
+    _middle.calibrate(95, 30);
     _right.calibrate(67, 17);    
      reset(); 
 }
@@ -26,18 +26,18 @@ void SpiderController::turnRight()
 void SpiderController::forward()
 {
   sweepFromTo(_middle,  _middle.getMin());
-  delay(100); 
+  delay(500); 
   int rangeLeft = _left.getMax() - _left.getPosition();
   int rangeRight = _right.getMax() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(100);
+  delay(500);
   
   sweepFromTo(_middle, _middle.getMax());
-  delay(100);
+  delay(500);
   rangeLeft = _left.getMin() - _left.getPosition();
   rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(100);
+  delay(500);
 
 }
 
@@ -87,7 +87,7 @@ void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int range2)
            curr2++;
          }
      }   
-     delay(4);  
+     delay(10);  
   }
 }
 
