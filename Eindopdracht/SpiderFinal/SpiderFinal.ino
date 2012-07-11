@@ -1,3 +1,4 @@
+#include <Wire.h>
 #include <Motor.h>
 #include <SpiderController.h>
 #include "SpiderFinal.h"
@@ -7,8 +8,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <RF24_config.h>
-
-
+#include <Compass.h>
 
 //RADIO
 RF24 radio(9,10);
@@ -22,6 +22,7 @@ const int retries = 5;
 //RIGHT tussen 60 en 100
 //MIDDLE tussen 65 en 125
 SpiderController control;
+Compass compass;
 
 //#define leftMax 120
 //#define leftMin 85
@@ -45,8 +46,10 @@ void setup(){
 
 void loop(){
   //handle remote control
-  sendHandshake();
-  receiveHeading();
+  //sendHandshake();
+  //receiveHeading();
+  control.back();
+  Serial.println(compass.getHeading());
   //control.forward();
   //handle compass
   //handle radio
@@ -119,7 +122,10 @@ void receiveHeading(){
   }
   
   if(isRead){
+    radio.stopListening();
     moveSpider();
+    radio.startListening();
+    delay(20);
   }
 }
 

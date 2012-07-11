@@ -1,14 +1,25 @@
 #include "Arduino.h"
 #include "SpiderController.h"
+
 SpiderController::SpiderController(){
 }
 void SpiderController::begin(int leftpin, int middlepin, int rightpin){   
     _left.attach(leftpin);
     _right.attach(rightpin);
     _middle.attach(middlepin);
-    _left.calibrate(102, 17);
-    _middle.calibrate(90, 17);
-    _right.calibrate(78, 17);    
+	
+	_middle.calibrate(95, 20);
+	
+	//hoofdspin
+	//_middle.calibrate(95, 20);
+	//_left.calibrate(102, 17);    
+    //_right.calibrate(67, 17);  
+
+	//tweede spin
+	_middle.calibrate(92, 20);
+	_left.calibrate(107, 17);
+	_right.calibrate(72, 17);
+	
      reset(); 
 }
 
@@ -26,24 +37,36 @@ void SpiderController::turnRight()
 void SpiderController::forward()
 {
   sweepFromTo(_middle,  _middle.getMin());
-  delay(100); 
+  delay(500); 
   int rangeLeft = _left.getMax() - _left.getPosition();
   int rangeRight = _right.getMax() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(100);
+  delay(500);
   
   sweepFromTo(_middle, _middle.getMax());
-  delay(100);
+  delay(500);
   rangeLeft = _left.getMin() - _left.getPosition();
   rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(100);
+  delay(500);
 
 }
 
 void SpiderController::back()
 {
-
+  sweepFromTo(_middle,  _middle.getMin());
+  delay(500); 
+  int rangeLeft = _left.getMin() - _left.getPosition();
+  int rangeRight = _right.getMin() - _right.getPosition();
+  sweepTwo(_left, rangeLeft, _right, rangeRight);
+  delay(500);
+  
+  sweepFromTo(_middle, _middle.getMax());
+  delay(500);  
+  rangeLeft = _left.getMax() - _left.getPosition();
+  rangeRight = _right.getMax() - _right.getPosition();
+  sweepTwo(_left, rangeLeft, _right, rangeRight);
+  delay(500);
 }
 
 void SpiderController::reset()
@@ -87,7 +110,7 @@ void SpiderController::sweepTwo(Motor mot1, int range1, Motor mot2, int range2)
            curr2++;
          }
      }   
-     delay(4);  
+     delay(10);  
   }
 }
 
