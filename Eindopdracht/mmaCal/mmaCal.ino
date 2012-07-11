@@ -28,7 +28,6 @@ Direction current = NONE;
 
 void setup(){
   pinMode(5, OUTPUT);
-  pinMode(7, OUTPUT);
   mma.begin();
   printf_begin();
   Serial.begin(57600);
@@ -135,23 +134,22 @@ void calibrate(){
 
 void loop(){
   //Serial.println("Looping!");
-  radio.startListening();
   boolean ready = false;
-  digitalWrite(7, HIGH);
+  Serial.println("Starting busy wait");
   while(!ready){
     if(radio.available()){
       ready = true;
-    }else{
-      
     }
   }
-  digitalWrite(7, LOW);
+  Serial.println("Request received");
 
   char msg[32];
 
   boolean isRead = radio.read(&msg, 32);
-
+  
   radio.stopListening();
+  delay(20);
+  
   if(isRead){
     int x, y, z = 0;
     mma.getAccXYZ(&x,&y,&z);
@@ -161,23 +159,25 @@ void loop(){
       Serial.println("FORWARD");
     }
     else if(dir == BACK && current != BACK){
-      Serial.println("Back" );
+      Serial.println("BACKWARD" );
     }
     else if(dir == LEFT && current != LEFT){
-      Serial.println("Left" );
+      Serial.println("LEFT" );
     }
     else if(dir == RIGHT && current != RIGHT){
-      Serial.println("Right" );
+      Serial.println("RIGHT" );
     }
-    else if(dir == NONE && current != NONE){
-      Serial.println("None");
+    else if (dir == NONE && current != NONE){
+      Serial.println("NONE");
     }
     current = dir;
+    //radio.stopListening();
     sendDirection(dir, 0);
   }else{
     Serial.println("No can't do!");
   }
   
+  radio.startListening();
   delay(20);
 }
 
@@ -217,10 +217,14 @@ void sendDirection(int dir, int val){
   while(!isSend && i < retries){
     bool isSend = radio.write(message, 32);
     if(isSend){
-      //Serial.println(i);  
+      Serial.println("Message send.");  
     }  
     i++;
   }
+  if(!isSend){
+     Serial.println("Failed to send message.");
+  }
+
 }
 
 

@@ -46,10 +46,10 @@ void setup(){
 
 void loop(){
   //handle remote control
-  //sendHandshake();
-  //receiveHeading();
-  control.back();
-  Serial.println(compass.getHeading());
+  sendHandshake();
+  receiveHeading();
+  //control.back();
+  //Serial.println(compass.getHeading());
   //control.forward();
   //handle compass
   //handle radio
@@ -123,6 +123,7 @@ void receiveHeading(){
   
   if(isRead){
     radio.stopListening();
+    delay(20);
     moveSpider();
     radio.startListening();
     delay(20);
