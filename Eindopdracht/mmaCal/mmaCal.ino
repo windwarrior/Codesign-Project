@@ -28,6 +28,7 @@ Direction current = NONE;
 
 void setup(){
   pinMode(5, OUTPUT);
+  pinMode(7, OUTPUT);
   mma.begin();
   printf_begin();
   Serial.begin(57600);
@@ -136,7 +137,7 @@ void loop(){
   //Serial.println("Looping!");
   radio.startListening();
   boolean ready = false;
-  Serial.println("Starting busy wait");
+  digitalWrite(7, HIGH);
   while(!ready){
     if(radio.available()){
       ready = true;
@@ -144,12 +145,13 @@ void loop(){
       
     }
   }
-  Serial.println("Request received");
+  digitalWrite(7, LOW);
 
   char msg[32];
 
   boolean isRead = radio.read(&msg, 32);
-  
+
+  radio.stopListening();
   if(isRead){
     int x, y, z = 0;
     mma.getAccXYZ(&x,&y,&z);
@@ -167,11 +169,10 @@ void loop(){
     else if(dir == RIGHT && current != RIGHT){
       Serial.println("Right" );
     }
-    else if (dir == NONE && current != NONE){
+    else if(dir == NONE && current != NONE){
       Serial.println("None");
     }
     current = dir;
-    radio.stopListening();
     sendDirection(dir, 0);
   }else{
     Serial.println("No can't do!");
