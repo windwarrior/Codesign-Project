@@ -109,7 +109,11 @@ void receiveHeading(){
   boolean isRead = false;
   if(ready){ 
     char msg[32];
-    isRead = radio.read(&msg, 32);
+    
+    while(!isRead){
+      isRead = radio.read(&msg, 32);
+      delay(20);
+    }
     
     currentDirection = getDirection(msg[0]);
   
