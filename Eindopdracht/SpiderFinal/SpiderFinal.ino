@@ -39,7 +39,7 @@ void setup(){
   printf_begin();
   pinMode(4, OUTPUT);
   Serial.begin(57600);
-  control.begin(3,5,6);
+  control.begin(7,5,6);
   setupRadio();
   delay(3000);
 }
@@ -92,7 +92,7 @@ void sendHandshake(){
 }
 
 void receiveHeading(){
-  int time = millis() + 100;//200ms timeout
+  long time = millis() + 100;//200ms timeout
   boolean timeout = false;
   boolean ready = false;
   digitalWrite(4, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
