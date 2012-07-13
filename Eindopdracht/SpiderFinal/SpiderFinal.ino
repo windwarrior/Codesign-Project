@@ -10,13 +10,16 @@
 #include <RF24_config.h>
 #include <Compass.h>
 
+#define DEBUGLED 4
+#define ROLEPIN 14
 //RADIO
 RF24 radio(9,10);
 const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
 const int channel = 88;
 const int retries = 5;
-
-
+bool isLeader = false;
+bool hasReceived = false;
+void check_radio(void); //TODO: geen idee, don't care
 //SPIDERWALK
 //LEFT  tussen 80 en 120
 //RIGHT tussen 60 en 100
@@ -37,7 +40,10 @@ int currentDirection = NONE;
 
 void setup(){
   printf_begin();
-  pinMode(4, OUTPUT);
+  pinMode(DEBUGLED, OUTPUT);
+  pinMode(ROLEPIN, INPUT);
+  delay(200);
+  isLeader = !digitalRead(ROLEPIN);
   Serial.begin(57600);
   control.begin(3,5,6);
   setupRadio();
@@ -71,6 +77,10 @@ void setupRadio(){
   radio.startListening();
 
   radio.printDetails();
+
+  if(isLeader){
+    attachInterrupt(0, check_radio, FALLING);
+  }    
 }
 
 void sendHandshake(){
@@ -95,7 +105,7 @@ void receiveHeading(){
   int time = millis() + 100;//200ms timeout
   boolean timeout = false;
   boolean ready = false;
-  digitalWrite(4, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
+  digitalWrite(DEBUGLED, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
   while(!ready && !timeout){
     if(radio.available()){
       ready = true;
@@ -104,7 +114,7 @@ void receiveHeading(){
       timeout = true;
     }
   }
-  digitalWrite(4, LOW); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
+  digitalWrite(DEBUGLED, LOW); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
   
   boolean isRead = false;
   if(ready){ 
@@ -129,6 +139,16 @@ void receiveHeading(){
   }
 }
 
+void check_radio(void){
+  bool tx,fail,rx;
+  radio.whatHappened(tx, fail, rx);
+
+  if(rx){
+    //We ontvangen dus shit, hooraay!
+    hasReceived = true;
+  }
+
+}
 //SPIDERWALK FUNCTIONS
 void moveSpider(){
    if(currentDirection == FORWARD){
