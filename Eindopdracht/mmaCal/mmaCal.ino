@@ -13,7 +13,7 @@ MMA845 mma;
 RF24 radio(3,9);
 
 const uint64_t pipes[2] = { 
-  0xd250dbcf39LL, 0x4aac2e23feLL };
+  0x1761D0F64ALL, 0x1761D0F64BLL };
 
 const int channel = 88;
 const int retries = 5;
