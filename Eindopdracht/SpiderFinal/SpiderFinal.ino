@@ -55,7 +55,9 @@ void setup(){
   setupRadio();
   delay(3000);
   if(isLeader){   
-    Serial.println("Luke, I am your father!"); 
+    Serial.println("Read leader standing by!"); 
+    delay(1000);
+    Serial.println("Gold leader standing by!");
   }
 }
 
