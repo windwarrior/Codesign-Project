@@ -8,8 +8,6 @@ void SpiderController::begin(int leftpin, int middlepin, int rightpin){
     _right.attach(rightpin);
     _middle.attach(middlepin);
 	
-	_middle.calibrate(95, 20);
-	
 	//hoofdspin
 	//_middle.calibrate(95, 20);
 	//_left.calibrate(102, 17);    
@@ -37,36 +35,36 @@ void SpiderController::turnRight()
 void SpiderController::forward()
 {
   sweepFromTo(_middle,  _middle.getMin());
-  delay(500); 
+  delay(100); 
   int rangeLeft = _left.getMax() - _left.getPosition();
   int rangeRight = _right.getMax() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(500);
+  delay(100);
   
   sweepFromTo(_middle, _middle.getMax());
-  delay(500);
+  delay(100);
   rangeLeft = _left.getMin() - _left.getPosition();
   rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(500);
+  //delay(100);
 
 }
 
 void SpiderController::back()
 {
   sweepFromTo(_middle,  _middle.getMin());
-  delay(500); 
+  delay(100); 
   int rangeLeft = _left.getMin() - _left.getPosition();
   int rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(500);
+  delay(100);
   
   sweepFromTo(_middle, _middle.getMax());
-  delay(500);  
+  delay(100);  
   rangeLeft = _left.getMax() - _left.getPosition();
   rangeRight = _right.getMax() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(500);
+  //delay(100);
 }
 
 void SpiderController::reset()
@@ -142,11 +140,11 @@ void SpiderController::turn(Turn side){
   }
 
   //Then move its legs
-  delay(500);
+  delay(100);
   int rangeLeft = _left.getMin() - _left.getPosition();
   int rangeRight = _right.getMax() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(500);
+  delay(100);
   
   //Tilt it to its other side
   if(side == TURN_LEFT){
@@ -156,11 +154,11 @@ void SpiderController::turn(Turn side){
   }
 
   //And move its legs to the other side
-  delay(500);
+  delay(100);
   rangeLeft = _left.getMax() - _left.getPosition();
   rangeRight = _right.getMin() - _right.getPosition();
   sweepTwo(_left, rangeLeft, _right, rangeRight);
-  delay(500);
+  //delay(100);
 }
 
 void SpiderController::test(){

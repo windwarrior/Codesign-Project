@@ -45,17 +45,17 @@ void setup(){
   delay(200);
   isLeader = !digitalRead(ROLEPIN);
   Serial.begin(57600);
-  control.begin(3,5,6);
+  control.begin(7,5,6);
   setupRadio();
   delay(3000);
 }
 
 void loop(){
   //handle remote control
-  //sendHandshake();
-  //receiveHeading();
-  control.back();
-  Serial.println(compass.getHeading());
+  sendHandshake();
+  receiveHeading();
+  //control.back();
+  //Serial.println(compass.getHeading());
   //control.forward();
   //handle compass
   //handle radio
@@ -98,11 +98,11 @@ void sendHandshake(){
     i++;
   }  
   radio.startListening();
-  delay(20);//TODO: KORTER MAKEN!
+  //delay(20);//TODO: KORTER MAKEN!
 }
 
 void receiveHeading(){
-  int time = millis() + 100;//200ms timeout
+  long time = millis() + 5k0;//200ms timeout
   boolean timeout = false;
   boolean ready = false;
   digitalWrite(DEBUGLED, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
@@ -119,7 +119,11 @@ void receiveHeading(){
   boolean isRead = false;
   if(ready){ 
     char msg[32];
-    isRead = radio.read(&msg, 32);
+    
+    while(!isRead){
+      isRead = radio.read(&msg, 32);
+      //delay(20);
+    }
     
     currentDirection = getDirection(msg[0]);
   
@@ -133,9 +137,10 @@ void receiveHeading(){
   
   if(isRead){
     radio.stopListening();
+    //delay(20);
     moveSpider();
     radio.startListening();
-    delay(20);
+    //delay(20);
   }
 }
 
@@ -161,7 +166,7 @@ void moveSpider(){
       control.turnRight();
        Serial.println("rechts");
    } else if(currentDirection == BACK){
-     //wololo achteruit
+     control.back();
       Serial.println("achter");
    } else if(currentDirection == NONE) {
        Serial.println("niks"); 
