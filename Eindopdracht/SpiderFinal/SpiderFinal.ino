@@ -106,7 +106,7 @@ void sendHandshake(){
 }
 
 void receiveHeading(){
-  long time = millis() + 5k0;//200ms timeout
+  long time = millis() + 50;//200ms timeout
   boolean timeout = false;
   boolean ready = false;
   digitalWrite(DEBUGLED, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
