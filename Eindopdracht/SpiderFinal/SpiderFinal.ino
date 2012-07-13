@@ -14,12 +14,18 @@
 #define ROLEPIN 14
 //RADIO
 RF24 radio(9,10);
-const uint64_t pipes[2] = { 0xd250dbcf39LL, 0x4aac2e23feLL };
+
+const uint64_t fromRemoteToSpider1 = 0x1761D0F64All;
+const uint64_t fromSpider1ToRemote = 0x1761D0F64Bll;
+const uint64_t fromSpider1ToSpider2 = 0x1761D0F64Cll;
+const uint64_t fromSpider2ToSpider1 = 0x1761D0F64Dll;
 const int channel = 88;
 const int retries = 5;
 bool isLeader = false;
 bool hasReceived = false;
 void check_radio(void); //TODO: geen idee, don't care
+
+char lastMsg[32];
 //SPIDERWALK
 //LEFT  tussen 80 en 120
 //RIGHT tussen 60 en 100
@@ -56,8 +62,16 @@ void loop(){
     Serial.println("JONGENS, IK HEB SHIT ONTVANGEN");
     hasReceived = false;
   }
-  sendHandshake();
-  receiveHeading();
+
+  if(isLeader){
+    sendHandshakeToRemote();
+    receiveHeadingFromRemote();
+    sendHeadingToFollower();
+  }else{
+    //oke we moeten  dus interrupten en wachten op data
+    interruptLeader();
+    receiveHeadingFromLeader();
+  }
   //control.back();
   //Serial.println(compass.getHeading());
   //control.forward();
@@ -73,10 +87,14 @@ void setupRadio(){
   radio.setRetries(15,15);
   radio.setPayloadSize(32);
 
-  radio.openWritingPipe(pipes[1]);
-  
-  //TODO: afvragen  of dit strict noodzakelijk is
-  radio.openReadingPipe(1, pipes[0]);
+  if(isLeader){
+    radio.openWritingPipe(fromSpider1ToRemote);
+    radio.openReadingPipe(1, fromRemoteToSpider1);
+    radio.openReadingPipe(2, fromSpider2ToSpider1);
+  } else {
+    radio.openWritingPipe(fromSpider2ToSpider1);
+    radio.openReadingPipe(1, fromSpider1ToSpider2);
+  }
 
   radio.startListening();
 
@@ -87,7 +105,7 @@ void setupRadio(){
   }    
 }
 
-void sendHandshake(){
+void sendHandshakeToRemote(){
   radio.stopListening();
   char message[32];
   message[31] = 0x00;
@@ -105,7 +123,7 @@ void sendHandshake(){
   //delay(20);//TODO: KORTER MAKEN!
 }
 
-void receiveHeading(){
+void receiveHeadingFromRemote(){
   long time = millis() + 50;//200ms timeout
   boolean timeout = false;
   boolean ready = false;
@@ -133,7 +151,8 @@ void receiveHeading(){
   
     Serial.println("---------------------------");
     Serial.print("Message received: ");
-    Serial.println(msg[0]);  
+    Serial.println(msg[0]); 
+    lastMsg = msg; 
   }
   if(!ready && timeout){
      Serial.println("Timeout..."); 
@@ -154,7 +173,9 @@ void check_radio(void){
 
   if(rx){
     //We ontvangen dus shit, hooraay!
-    hasReceived = true;
+    if(radio.available(fromSpider2ToSpider1){
+        hasReceived = true;
+    }
   }
 
 }
@@ -177,6 +198,52 @@ void moveSpider(){
    }
 }
 
+void interruptLeader(){
+  int i = 0;
+  char message[32];
+  message[31] = 0x00;
+  message[1] = '1';
+  while(!isSend && i < retries){
+    bool isSend = radio.write(message, 32);
+    if(isSend){
+      Serial.println("Request sent");  
+    }
+    i++;
+  }  
+} 
+
+void receiveHeadingFromLeader(){
+  boolean ready = false;
+  long time = millis() + 100;
+  while(!ready && !timeout){
+    if(radio.available()){
+      ready = true;
+    }
+    if(millis() > time){
+      interruptLeader();
+      time = millis() + 100;
+    }
+  }
+
+  //read the message
+  //think about what to do
+  //run around in circles
+  //think again
+  //consider doing something
+  //leave it be
+}
+
+void sendHeadingToFollower(){
+  int i = 0;
+  while(!isSend && i < retries){
+    bool isSend = radio.write(lastMsg, 32);
+    if(isSend){
+      Serial.println("Sent heading to follower spider");  
+    }
+    i++;
+  }  
+
+}
 //DIRECTION
 Direction getDirection(char val){
   if(val == '0'){
