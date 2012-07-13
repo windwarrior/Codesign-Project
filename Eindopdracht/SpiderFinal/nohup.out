@@ -1,0 +1,5 @@
+
+(gedit:4196): Gtk-CRITICAL **: gtk_widget_event: assertion `WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
+
+(gedit:4196): GLib-CRITICAL **: g_main_loop_quit: assertion `g_atomic_int_get (&loop->ref_count) > 0' failed
+g_dbus_connection_real_closed: Remote peer vanished with error: Underlying GIOStream returned 0 bytes on an async read (g-io-error-quark, 0). Exiting.

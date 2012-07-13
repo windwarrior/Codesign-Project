@@ -52,6 +52,10 @@ void setup(){
 
 void loop(){
   //handle remote control
+  if(hasReceived){
+    Serial.println("JONGENS, IK HEB SHIT ONTVANGEN");
+    hasReceived = false;
+  }
   sendHandshake();
   receiveHeading();
   //control.back();
