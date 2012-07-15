@@ -11,9 +11,9 @@
 #include <Compass.h>
 
 #define DEBUGLED 4
-#define ROLEPIN 14
+#define ROLEPIN 7
 //RADIO
-RF24 radio(9,10);
+RF24 radio(3,9);
 
 const uint64_t fromRemoteToSpider1 = 0x1761D0F64All;
 const uint64_t fromSpider1ToRemote = 0x1761D0F64Bll;
@@ -48,14 +48,15 @@ void setup(){
   printf_begin();
   pinMode(DEBUGLED, OUTPUT);
   pinMode(ROLEPIN, INPUT);
+  digitalWrite(ROLEPIN, HIGH);
   delay(200);
-  isLeader = !digitalRead(ROLEPIN);
+  isLeader = !digitalRead(ROLEPIN) ? true : false;
   Serial.begin(57600);
   control.begin(7,5,6);
   setupRadio();
   delay(3000);
   if(isLeader){   
-    Serial.println("Read leader standing by!"); 
+    Serial.println("Red leader standing by!"); 
     delay(1000);
     Serial.println("Gold leader standing by!");
   }
@@ -69,8 +70,8 @@ void loop(){
   }
 
   if(isLeader){
-    sendHandshakeToRemote();
-    receiveHeadingFromRemote();
+    //sendHandshakeToRemote();
+    //receiveHeadingFromRemote();
     sendHeadingToFollower();
   }else{
     //oke we moeten  dus interrupten en wachten op data
@@ -181,7 +182,7 @@ void check_radio(void){
   if(rx){
     //We ontvangen dus shit, hooraay!
     uint8_t tmpPipe = 2;
-    if(radio.available(&tmpPipe)){
+    if(radio.available()){//&tmpPipe
         hasReceived = true;
     }
   }
@@ -216,6 +217,8 @@ void interruptLeader(){
     isSend = radio.write(message, 32);
     if(isSend){
       Serial.println("Request sent");  
+    } else {
+       Serial.println("Failed to sent interrupt"); 
     }
     i++;
   }  
@@ -244,19 +247,21 @@ void receiveHeadingFromLeader(){
 }
 
 void sendHeadingToFollower(){
-  int i = 0;
-  radio.openWritingPipe(fromSpider2ToSpider1);
-  radio.stopListening();
-  bool isSend = false;
-  while(!isSend && i < retries){
-    isSend = radio.write(lastMsg, 32);
-    if(isSend){
-      Serial.println("Sent heading to follower spider");  
-    }
-    i++;
-  }  
-  radio.startListening();  
-  radio.openWritingPipe(fromSpider1ToRemote);
+  if(hasReceived){
+    int i = 0;
+    radio.openWritingPipe(fromSpider1ToSpider2);
+    radio.stopListening();
+    bool isSend = false;
+    while(!isSend && i < retries){
+      isSend = radio.write(lastMsg, 32);
+      if(isSend){
+        Serial.println("Sent heading to follower spider");  
+      }
+      i++;
+    }  
+    radio.startListening();  
+    radio.openWritingPipe(fromSpider1ToRemote);
+  }
 }
 //DIRECTION
 Direction getDirection(char val){
