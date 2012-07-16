@@ -26,6 +26,7 @@ bool hasReceived = false;
 void check_radio(void); //TODO: geen idee, don't care
 
 char lastMsg[32];
+char tmp_msg[32];
 //SPIDERWALK
 //LEFT  tussen 80 en 120
 //RIGHT tussen 60 en 100
@@ -59,6 +60,8 @@ void setup(){
     Serial.println("Red leader standing by!"); 
     delay(1000);
     Serial.println("Gold leader standing by!");
+  } else {
+     radio.stopListening(); 
   }
 }
 
@@ -75,8 +78,9 @@ void loop(){
     //sendHeadingToFollower();
   }else{
     //oke we moeten  dus interrupten en wachten op data
-    //interruptLeader();
-    receiveHeadingFromLeader();
+    interruptLeader();
+    delay(200);
+    //receiveHeadingFromLeader();
   }
   //control.back();
   //Serial.println(compass.getHeading());
@@ -96,6 +100,7 @@ void setupRadio(){
   if(isLeader){
     //radio.openWritingPipe(fromSpider1ToRemote);
     //radio.openReadingPipe(1, fromRemoteToSpider1);
+    radio.openWritingPipe(fromSpider1ToSpider2);
     radio.openReadingPipe(2, fromSpider2ToSpider1);
   } else {
     radio.openWritingPipe(fromSpider2ToSpider1);
@@ -106,9 +111,9 @@ void setupRadio(){
 
   radio.printDetails();
 
- // if(isLeader){
+  if(isLeader){
     attachInterrupt(0, check_radio, FALLING);
-  //}    
+  }    
 }
 
 void sendHandshakeToRemote(){
@@ -181,11 +186,10 @@ void check_radio(void){
 
   if(rx){
     //We ontvangen dus shit, hooraay!
-    uint8_t tmpPipe = 2;
+    //uint8_t tmpPipe = 2;
     //if(radio.available()){//&tmpPipe
     //    hasReceived = true;
     //}
-    char tmp_msg[32];
     if(radio.read(&tmp_msg,32)){
        hasReceived = true; 
     }
@@ -212,16 +216,17 @@ void moveSpider(){
 }
 
 void interruptLeader(){
-  radio.stopListening();
+  //radio.stopListening();
   int i = 0;
   char message[32];
   message[31] = 0x00;
   message[1] = '1';
   bool isSend = false;
   while(!isSend && i < retries){
-    Serial.println("Starting interrupt write");
-    isSend = radio.write(message, 32);
-    Serial.println("Ending interrupt write");
+    //Serial.println("Starting interrupt write");
+    isSend = radio.write(&message, 32);
+    delay(20);
+    //Serial.println("Ending interrupt write");
     if(isSend){
       Serial.println("Interrupt sent");  
     } else {
@@ -229,7 +234,7 @@ void interruptLeader(){
     }
     i++;
   }  
-  radio.startListening();
+  //radio.startListening();
 } 
 
 void receiveHeadingFromLeader(){
