@@ -53,7 +53,7 @@ void setup(){
   delay(200);
   isLeader = !digitalRead(ROLEPIN) ? true : false;
   Serial.begin(57600);
-  control.begin(7,5,6);
+  //control.begin(7,5,6);
   setupRadio();
   delay(3000);
   if(isLeader){   
@@ -76,6 +76,12 @@ void loop(){
     sendHandshakeToRemote();
     receiveHeadingFromRemote();
     //sendHeadingToFollower();
+    Serial.println("I'm still alive");
+    while(!radio.available()){
+      
+    }
+    Serial.println("Ik lees wat!");
+    delay(500);
   }else{
     //oke we moeten  dus interrupten en wachten op data
     interruptLeader();
@@ -185,7 +191,7 @@ void check_radio(void){
   bool tx,fail,rx;
   radio.whatHappened(tx, fail, rx);
 
-  if(rx){
+  if(rx && isLeader){
     //We ontvangen dus shit, hooraay!
     //uint8_t tmpPipe = 2;
     //if(radio.available()){//&tmpPipe
@@ -226,7 +232,7 @@ void interruptLeader(){
   while(!isSend && i < retries){
     //Serial.println("Starting interrupt write");
     isSend = radio.write(&message, 32);
-    delay(20);
+    delay(200);
     //Serial.println("Ending interrupt write");
     if(isSend){
       Serial.println("Interrupt sent");  
