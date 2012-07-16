@@ -12,8 +12,8 @@
 MMA845 mma;
 RF24 radio(3,9);
 
-const uint64_t pipes[2] = { 
-  0x1761D0F64ALL, 0x1761D0F64BLL };
+const uint64_t fromRemoteToSpider1 = 0x1761D0F64All;
+const uint64_t fromSpider1ToRemote = 0x1761D0F64Bll;
 
 const int channel = 88;
 const int retries = 5;
@@ -44,10 +44,10 @@ void setupRadio(){
   radio.setRetries(15,15);
   radio.setPayloadSize(32);
 
-  radio.openWritingPipe(pipes[0]);
+  radio.openWritingPipe(fromRemoteToSpider1);
 
   //TODO: afvragen  of dit strict noodzakelijk is
-  radio.openReadingPipe(1, pipes[1]);
+  radio.openReadingPipe(1, fromSpider1ToRemote);
 
   radio.startListening();
 

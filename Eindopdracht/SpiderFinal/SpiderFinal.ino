@@ -73,8 +73,8 @@ void loop(){
   }
 
   if(isLeader){
-    //sendHandshakeToRemote();
-    //receiveHeadingFromRemote();
+    sendHandshakeToRemote();
+    receiveHeadingFromRemote();
     //sendHeadingToFollower();
   }else{
     //oke we moeten  dus interrupten en wachten op data
@@ -98,10 +98,10 @@ void setupRadio(){
   radio.setPayloadSize(32);
 
   if(isLeader){
-    //radio.openWritingPipe(fromSpider1ToRemote);
-    //radio.openReadingPipe(1, fromRemoteToSpider1);
-    radio.openWritingPipe(fromSpider1ToSpider2);
-    radio.openReadingPipe(2, fromSpider2ToSpider1);
+    radio.openWritingPipe(fromSpider1ToRemote);
+    radio.openReadingPipe(1, fromRemoteToSpider1);
+    //radio.openWritingPipe(fromSpider1ToSpider2);
+    //radio.openReadingPipe(2, fromSpider2ToSpider1);
   } else {
     radio.openWritingPipe(fromSpider2ToSpider1);
     radio.openReadingPipe(1, fromSpider1ToSpider2);
@@ -111,12 +111,13 @@ void setupRadio(){
 
   radio.printDetails();
 
-  if(isLeader){
-    attachInterrupt(0, check_radio, FALLING);
-  }    
+  //if(isLeader){
+  //  attachInterrupt(0, check_radio, FALLING);
+  //}    
 }
 
 void sendHandshakeToRemote(){
+  Serial.println("begin of sendHandShakeToRemote()");
   radio.stopListening();
   char message[32];
   message[31] = 0x00;
