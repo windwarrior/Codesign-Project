@@ -226,9 +226,8 @@ void interruptLeader(){
 
 void receiveHeadingFromLeader(){
   boolean ready = false;
-  boolean timeout = false;
   long time = millis() + 100;
-  while(!ready && !timeout){
+  while(!ready){
     if(radio.available()){
       ready = true;
     }
