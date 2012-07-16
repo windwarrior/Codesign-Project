@@ -256,6 +256,8 @@ void sendHeadingToFollower(){
       isSend = radio.write(lastMsg, 32);
       if(isSend){
         Serial.println("Sent heading to follower spider");  
+      } else {
+        Serial.println("Failed to sent heading to follower spider");
       }
       i++;
     }  
