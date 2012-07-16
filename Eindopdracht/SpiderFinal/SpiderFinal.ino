@@ -11,9 +11,9 @@
 #include <Compass.h>
 
 #define DEBUGLED 4
-#define ROLEPIN 7
+#define ROLEPIN 14
 //RADIO
-RF24 radio(3,9);
+RF24 radio(9,10);
 
 const uint64_t fromRemoteToSpider1 = 0x1761D0F64All;
 const uint64_t fromSpider1ToRemote = 0x1761D0F64Bll;
@@ -72,10 +72,10 @@ void loop(){
   if(isLeader){
     //sendHandshakeToRemote();
     //receiveHeadingFromRemote();
-    sendHeadingToFollower();
+    //sendHeadingToFollower();
   }else{
     //oke we moeten  dus interrupten en wachten op data
-    interruptLeader();
+    //interruptLeader();
     receiveHeadingFromLeader();
   }
   //control.back();
@@ -94,8 +94,8 @@ void setupRadio(){
   radio.setPayloadSize(32);
 
   if(isLeader){
-    radio.openWritingPipe(fromSpider1ToRemote);
-    radio.openReadingPipe(1, fromRemoteToSpider1);
+    //radio.openWritingPipe(fromSpider1ToRemote);
+    //radio.openReadingPipe(1, fromRemoteToSpider1);
     radio.openReadingPipe(2, fromSpider2ToSpider1);
   } else {
     radio.openWritingPipe(fromSpider2ToSpider1);
@@ -106,9 +106,9 @@ void setupRadio(){
 
   radio.printDetails();
 
-  if(isLeader){
+ // if(isLeader){
     attachInterrupt(0, check_radio, FALLING);
-  }    
+  //}    
 }
 
 void sendHandshakeToRemote(){
@@ -182,8 +182,12 @@ void check_radio(void){
   if(rx){
     //We ontvangen dus shit, hooraay!
     uint8_t tmpPipe = 2;
-    if(radio.available()){//&tmpPipe
-        hasReceived = true;
+    //if(radio.available()){//&tmpPipe
+    //    hasReceived = true;
+    //}
+    char tmp_msg[32];
+    if(radio.read(&tmp_msg,32)){
+       hasReceived = true; 
     }
   }
 
@@ -208,20 +212,24 @@ void moveSpider(){
 }
 
 void interruptLeader(){
+  radio.stopListening();
   int i = 0;
   char message[32];
   message[31] = 0x00;
   message[1] = '1';
   bool isSend = false;
   while(!isSend && i < retries){
+    Serial.println("Starting interrupt write");
     isSend = radio.write(message, 32);
+    Serial.println("Ending interrupt write");
     if(isSend){
-      Serial.println("Request sent");  
+      Serial.println("Interrupt sent");  
     } else {
        Serial.println("Failed to sent interrupt"); 
     }
     i++;
   }  
+  radio.startListening();
 } 
 
 void receiveHeadingFromLeader(){
@@ -232,6 +240,7 @@ void receiveHeadingFromLeader(){
       ready = true;
     }
     if(millis() > time){
+      Serial.println("Sending interrupt....");
       interruptLeader();
       time = millis() + 100;
     }
