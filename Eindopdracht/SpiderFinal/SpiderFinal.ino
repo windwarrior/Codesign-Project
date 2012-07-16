@@ -12,90 +12,52 @@
 
 #define DEBUGLED 4
 #define ROLEPIN 14
-//RADIO
+
 RF24 radio(9,10);
 
 const uint64_t fromRemoteToSpider1 = 0x1761D0F64All;
 const uint64_t fromSpider1ToRemote = 0x1761D0F64Bll;
 const uint64_t fromSpider1ToSpider2 = 0x1761D0F64Cll;
 const uint64_t fromSpider2ToSpider1 = 0x1761D0F64Dll;
+
 const int channel = 88;
 const int retries = 5;
+
 bool isLeader = false;
 bool hasReceived = false;
-void check_radio(void); //TODO: geen idee, don't care
 
 char lastMsg[32];
 char tmp_msg[32];
-//SPIDERWALK
-//LEFT  tussen 80 en 120
-//RIGHT tussen 60 en 100
-//MIDDLE tussen 65 en 125
+
 SpiderController control;
 Compass compass;
 
-//#define leftMax 120
-//#define leftMin 85
-//
-//#define midMax 125
-//#define midMin 65
-//
-//#define rightMax 95
-//#define rightMin 60
-
 int currentDirection = NONE;
 
+void check_radio(void);
+
 void setup(){
+  Serial.begin(57600);
   printf_begin();
+  
   pinMode(DEBUGLED, OUTPUT);
   pinMode(ROLEPIN, INPUT);
   digitalWrite(ROLEPIN, HIGH);
   delay(200);
+  
   isLeader = !digitalRead(ROLEPIN) ? true : false;
-  Serial.begin(57600);
-  //control.begin(7,5,6);
-  setupRadio();
-  delay(3000);
-  if(isLeader){   
-    Serial.println("Red leader standing by!"); 
-    delay(1000);
-    Serial.println("Gold leader standing by!");
-  } else {
-     radio.stopListening(); 
-  }
-}
-
-void loop(){
-  //handle remote control
-  if(hasReceived){
-    Serial.println("JONGENS, IK HEB SHIT ONTVANGEN");
-    hasReceived = false;
-  }
 
   if(isLeader){
-    sendHandshakeToRemote();
-    receiveHeadingFromRemote();
-    //sendHeadingToFollower();
-    Serial.println("I'm still alive");
-    while(!radio.available()){
-      
-    }
-    Serial.println("Ik lees wat!");
-    delay(500);
-  }else{
-    //oke we moeten  dus interrupten en wachten op data
-    interruptLeader();
-    delay(200);
-    //receiveHeadingFromLeader();
+    Serial.println("I am RECEIVER");  
+  } else {
+    Serial.println("I am SENDER");
   }
-  //control.back();
-  //Serial.println(compass.getHeading());
-  //control.forward();
-  //handle compass
-  //handle radio
+  
+  //control.begin(7,5,6); 
+  setupRadio();  
+  delay(2000);
 }
 
-//RADIO FUNCTIONS
 void setupRadio(){
   radio.begin();
   delay(20);
@@ -104,24 +66,46 @@ void setupRadio(){
   radio.setPayloadSize(32);
 
   if(isLeader){
-    radio.openWritingPipe(fromSpider1ToRemote);
-    radio.openReadingPipe(1, fromRemoteToSpider1);
-    //radio.openWritingPipe(fromSpider1ToSpider2);
-    //radio.openReadingPipe(2, fromSpider2ToSpider1);
+    //radio.openWritingPipe(fromSpider1ToRemote);
+    //radio.openReadingPipe(1, fromRemoteToSpider1);
+    radio.openWritingPipe(fromSpider1ToSpider2);
+    radio.openReadingPipe(2, fromSpider2ToSpider1);
+    radio.startListening();
   } else {
     radio.openWritingPipe(fromSpider2ToSpider1);
     radio.openReadingPipe(1, fromSpider1ToSpider2);
   }
 
-  radio.startListening();
+  if(isLeader){
+    attachInterrupt(0, check_radio, FALLING);
+  }  
 
-  radio.printDetails();
-
-  //if(isLeader){
-  //  attachInterrupt(0, check_radio, FALLING);
-  //}    
+  radio.printDetails();  
 }
 
+void loop(){
+  if(isLeader){
+    //sendHandshakeToRemote();
+    //receiveHeadingFromRemote();
+    if(hasReceived){
+      Serial.println("JONGENS, IK HEB SHIT ONTVANGEN");
+      hasReceived = false;
+      sendHeadingToFollower();
+    }
+  }else{
+    //oke we moeten  dus interrupten en wachten op data
+    //interruptLeader();
+    //delay(200);
+    receiveHeadingFromLeader();
+  }
+  //control.back();
+  //Serial.println(compass.getHeading());
+  //control.forward();
+  //handle compass
+  //handle radio
+}
+
+//REMOTE
 void sendHandshakeToRemote(){
   Serial.println("begin of sendHandShakeToRemote()");
   radio.stopListening();
@@ -187,22 +171,96 @@ void receiveHeadingFromRemote(){
   }
 }
 
+//INTERRUPT RELATED
+void interruptLeader(){
+  radio.stopListening();
+  //int i = 0;
+  char message[32];
+  message[31] = 0x00;
+  message[1] = '1';
+  bool isSend = false;
+  while(!isSend/* && i < retries*/){
+    //Serial.println("Starting interrupt write");
+    isSend = radio.write(&message, 32);
+    //delay(200);
+    //Serial.println("Ending interrupt write");
+    if(isSend){
+      Serial.println("Interrupt sent");  
+    } else {
+       Serial.println("Failed to sent interrupt"); 
+    }
+    //i++;
+  }  
+  radio.startListening();
+} 
+
 void check_radio(void){
   bool tx,fail,rx;
   radio.whatHappened(tx, fail, rx);
 
   if(rx && isLeader){
-    //We ontvangen dus shit, hooraay!
-    //uint8_t tmpPipe = 2;
-    //if(radio.available()){//&tmpPipe
-    //    hasReceived = true;
-    //}
     if(radio.read(&tmp_msg,32)){
        hasReceived = true; 
     }
   }
-
 }
+
+//SPIDER COMMUNICATION
+void sendHeadingToFollower(){
+  detachInterrupt(0);
+  int i = 0;
+  radio.openWritingPipe(fromSpider1ToSpider2);
+  radio.stopListening();
+  bool isSend = false;
+  lastMsg[0] = 'Q';
+  while(!isSend && i < retries){
+    isSend = radio.write(lastMsg, 32);
+    if(isSend){
+      Serial.println("Sent heading to follower spider");  
+    } else {
+      Serial.println("Failed to sent heading to follower spider");
+    }
+    i++;
+  }  
+  radio.startListening();  
+  radio.openWritingPipe(fromSpider1ToRemote);
+  attachInterrupt(0, check_radio, FALLING);
+}
+
+void receiveHeadingFromLeader(){
+  boolean ready = false;
+  long time = millis() + 100;
+  while(!ready){
+    if(radio.available()){
+      ready = true;
+    } else {
+      if(millis() > time){
+        interruptLeader();
+        time = millis() + 2000;
+      }
+    }
+  }
+  
+  char msg[32];    
+  bool isRead = false; 
+  
+  while(!isRead){
+    isRead = radio.read(&msg, 32);
+  }
+    
+  //currentDirection = getDirection(msg[0]);
+  
+  Serial.print("Message received: ");
+  Serial.println(msg);
+
+  //read the message
+  //think about what to do
+  //run around in circles
+  //think again
+  //consider doing something
+  //leave it be
+}
+
 //SPIDERWALK FUNCTIONS
 void moveSpider(){
    if(currentDirection == FORWARD){
@@ -222,69 +280,7 @@ void moveSpider(){
    }
 }
 
-void interruptLeader(){
-  //radio.stopListening();
-  int i = 0;
-  char message[32];
-  message[31] = 0x00;
-  message[1] = '1';
-  bool isSend = false;
-  while(!isSend && i < retries){
-    //Serial.println("Starting interrupt write");
-    isSend = radio.write(&message, 32);
-    delay(200);
-    //Serial.println("Ending interrupt write");
-    if(isSend){
-      Serial.println("Interrupt sent");  
-    } else {
-       Serial.println("Failed to sent interrupt"); 
-    }
-    i++;
-  }  
-  //radio.startListening();
-} 
 
-void receiveHeadingFromLeader(){
-  boolean ready = false;
-  long time = millis() + 100;
-  while(!ready){
-    if(radio.available()){
-      ready = true;
-    }
-    if(millis() > time){
-      Serial.println("Sending interrupt....");
-      interruptLeader();
-      time = millis() + 100;
-    }
-  }
-
-  //read the message
-  //think about what to do
-  //run around in circles
-  //think again
-  //consider doing something
-  //leave it be
-}
-
-void sendHeadingToFollower(){
-  if(hasReceived){
-    int i = 0;
-    radio.openWritingPipe(fromSpider1ToSpider2);
-    radio.stopListening();
-    bool isSend = false;
-    while(!isSend && i < retries){
-      isSend = radio.write(lastMsg, 32);
-      if(isSend){
-        Serial.println("Sent heading to follower spider");  
-      } else {
-        Serial.println("Failed to sent heading to follower spider");
-      }
-      i++;
-    }  
-    radio.startListening();  
-    radio.openWritingPipe(fromSpider1ToRemote);
-  }
-}
 //DIRECTION
 Direction getDirection(char val){
   if(val == '0'){

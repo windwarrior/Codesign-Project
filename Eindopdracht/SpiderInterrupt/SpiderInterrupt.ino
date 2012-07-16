@@ -16,6 +16,7 @@ const int retries = 5;
 bool isLeader = false;
 bool hasReceived = false;
 
+uint8_t pipeInterrupt = 1;
 char tmp_msg[32];
 
 void check_radio(void);
@@ -111,13 +112,10 @@ void check_radio(void){
   bool tx,fail,rx;
   radio.whatHappened(tx, fail, rx);
 
+  //Only leader on read
   if(rx && isLeader){
-    //We ontvangen dus shit, hooraay!
-    //uint8_t tmpPipe = 2;
-    //if(radio.available()){//&tmpPipe
-    //    hasReceived = true;
-    //}
-    if(radio.read(&tmp_msg,32)){
+    //read message and check whether its from the following
+    if(radio.read(&tmp_msg,32) && tmp_msg[0] == '1'){
        hasReceived = true; 
     }
   }
