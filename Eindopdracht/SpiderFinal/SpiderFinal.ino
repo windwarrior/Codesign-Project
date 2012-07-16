@@ -7,7 +7,6 @@
 #include "printf.h"
 #include <nRF24L01.h>
 #include <RF24.h>
-#include <RF24_config.h>
 #include <Compass.h>
 
 #define DEBUGLED 4
@@ -53,7 +52,7 @@ void setup(){
     Serial.println("I am SENDER");
   }
   
-  //control.begin(7,5,6); 
+  control.begin(7,5,6); 
   setupRadio();  
   delay(2000);
 }
@@ -67,8 +66,8 @@ void setupRadio(){
 
   if(isLeader){
     //radio.openWritingPipe(fromSpider1ToRemote);
-    //radio.openReadingPipe(1, fromRemoteToSpider1);
-    radio.openWritingPipe(fromSpider1ToSpider2);
+    radio.openReadingPipe(1, fromRemoteToSpider1);
+    //radio.openWritingPipe(fromSpider1ToSpider2);
     radio.openReadingPipe(2, fromSpider2ToSpider1);
     radio.startListening();
   } else {
@@ -85,29 +84,27 @@ void setupRadio(){
 
 void loop(){
   if(isLeader){
-    //sendHandshakeToRemote();
-    //receiveHeadingFromRemote();
+    sendHandshakeToRemote();
+    receiveHeadingFromRemote();
     if(hasReceived){
       Serial.println("JONGENS, IK HEB SHIT ONTVANGEN");
       hasReceived = false;
       sendHeadingToFollower();
     }
   }else{
-    //oke we moeten  dus interrupten en wachten op data
-    //interruptLeader();
-    //delay(200);
     receiveHeadingFromLeader();
   }
-  //control.back();
-  //Serial.println(compass.getHeading());
-  //control.forward();
+  
   //handle compass
+  //Serial.println(compass.getHeading());
   //handle radio
 }
 
 //REMOTE
 void sendHandshakeToRemote(){
+  detachInterrupt(0);
   Serial.println("begin of sendHandShakeToRemote()");
+  radio.openWritingPipe(fromSpider1ToRemote);
   radio.stopListening();
   char message[32];
   message[31] = 0x00;
@@ -122,14 +119,15 @@ void sendHandshakeToRemote(){
     i++;
   }  
   radio.startListening();
-  //delay(20);//TODO: KORTER MAKEN!
+  attachInterrupt(0, check_radio, FALLING);
 }
 
 void receiveHeadingFromRemote(){
-  long time = millis() + 50;//200ms timeout
+  detachInterrupt(0);
+  long time = millis() + 50;
   boolean timeout = false;
   boolean ready = false;
-  digitalWrite(DEBUGLED, HIGH); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
+  digitalWrite(DEBUGLED, HIGH);
   while(!ready && !timeout){
     if(radio.available()){
       ready = true;
@@ -138,7 +136,7 @@ void receiveHeadingFromRemote(){
       timeout = true;
     }
   }
-  digitalWrite(DEBUGLED, LOW); //Kan het niet zo zijn dat deze heel snel weer getriggerd wordt?
+  digitalWrite(DEBUGLED, LOW);
   
   boolean isRead = false;
   if(ready){ 
@@ -146,7 +144,6 @@ void receiveHeadingFromRemote(){
     
     while(!isRead){
       isRead = radio.read(&msg, 32);
-      //delay(20);
     }
     
     currentDirection = getDirection(msg[0]);
@@ -154,20 +151,20 @@ void receiveHeadingFromRemote(){
     Serial.println("---------------------------");
     Serial.print("Message received: ");
     Serial.println(msg[0]);
-   for(int i=0; i<32; i++){
-     lastMsg[i] = msg[i];
-   }
+    for(int i=0; i<32; i++){
+      lastMsg[i] = msg[i];
+    }
   }
   if(!ready && timeout){
      Serial.println("Timeout..."); 
   }
   
+  attachInterrupt(0, check_radio, FALLING);
+  
   if(isRead){
     radio.stopListening();
-    //delay(20);
     moveSpider();
     radio.startListening();
-    //delay(20);
   }
 }
 
