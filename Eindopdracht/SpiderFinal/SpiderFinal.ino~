@@ -55,7 +55,6 @@ void setup(){
   }
   
   control.begin(7,5,6); 
-  ultrasonic.setup(4,3);
   setupRadio();  
   delay(2000);
 }
